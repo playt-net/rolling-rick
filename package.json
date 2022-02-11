@@ -1,0 +1,26 @@
+{
+  "name": "rolling-rick",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/playt-net/rolling-rick.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/playt-net/rolling-rick/issues"
+  },
+  "homepage": "https://github.com/playt-net/rolling-rick#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "http-proxy": "^1.18.1",
+    "node-fetch": "^3.2.0"
+  }
+}

@@ -17,6 +17,7 @@ app.post("/api/match", async (req, res) => {
   const { playerToken } = req.body;
 
   const match = await joinMatch(playerToken);
+  console.log({ match });
   matchIdByPlayerToken[playerToken] = match.id;
 
   res.end();
@@ -27,10 +28,16 @@ app.post("/api/score", async (req, res) => {
 
   const matchId = matchIdByPlayerToken[playerToken];
 
+  if (!matchId) {
+    res.status(400).end();
+    return;
+  }
   if (gameOver) {
-    await submitScore(matchId, playerToken, score);
+    const result = await submitScore(matchId, playerToken, score);
+    console.log({ result });
   } else {
-    await updateScore(matchId, playerToken, score);
+    const result = await updateScore(matchId, playerToken, score);
+    console.log({ result });
   }
   res.end();
 });
@@ -39,11 +46,8 @@ app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}`);
 });
 
-const auth = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString(
-  "base64"
-);
 const headers = {
-  Authorization: `Basic ${auth}`,
+  Accept: "application/json",
   "Content-Type": "application/json",
 };
 
@@ -51,6 +55,10 @@ async function joinMatch(playerToken) {
   const response = await fetch(`${API_HOST}/match/join/${playerToken}`, {
     method: "POST",
     headers,
+    body: JSON.stringify({
+      clientId: API_CLIENT_ID,
+      clientSecret: API_CLIENT_SECRET,
+    }),
   });
   return await response.json();
 }
@@ -59,7 +67,12 @@ async function updateScore(matchId, playerToken, score) {
   const response = await fetch(`${API_HOST}/match/${matchId}/score`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ playerToken, score }),
+    body: JSON.stringify({
+      playerToken,
+      score,
+      clientId: API_CLIENT_ID,
+      clientSecret: API_CLIENT_SECRET,
+    }),
   });
   return await response.json();
 }
@@ -68,7 +81,12 @@ async function submitScore(matchId, playerToken, score) {
   const response = await fetch(`${API_HOST}/match/${matchId}/score/submit`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ playerToken, score }),
+    body: JSON.stringify({
+      playerToken,
+      score,
+      clientId: API_CLIENT_ID,
+      clientSecret: API_CLIENT_SECRET,
+    }),
   });
   return await response.json();
 }

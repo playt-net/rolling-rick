@@ -1,4 +1,4 @@
-import { submitScore, updateScore } from "./playt.js";
+import { joinMatch, submitScore, updateScore } from "./playt.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -122,6 +122,8 @@ function create() {
   this.physics.add.overlap(player, stars, collectStar, null, this);
 
   this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+  joinMatch();
 }
 
 function update() {

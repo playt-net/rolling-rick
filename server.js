@@ -17,14 +17,13 @@ app.post("/api/match", async (req, res) => {
   const { playerToken } = req.body;
 
   const match = await joinMatch(playerToken);
-  console.log({ match });
   matchIdByPlayerToken[playerToken] = match.id;
 
-  res.end();
+  res.json(match);
 });
 
 app.post("/api/score", async (req, res) => {
-  const { score, playerToken, gameOver } = req.body;
+  const { score, playerToken, isFinal } = req.body;
 
   const matchId = matchIdByPlayerToken[playerToken];
 
@@ -32,60 +31,42 @@ app.post("/api/score", async (req, res) => {
     res.status(400).end();
     return;
   }
-  if (gameOver) {
-    const result = await submitScore(matchId, playerToken, score);
-    console.log({ result });
-  } else {
-    const result = await updateScore(matchId, playerToken, score);
-    console.log({ result });
-  }
-  res.end();
+  const result = await updateScore(matchId, playerToken, score, isFinal);
+  res.json(result);
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}`);
 });
 
+const authToken = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString(
+  "base64"
+);
 const headers = {
   Accept: "application/json",
+  Authorization: `Basic ${authToken}`,
   "Content-Type": "application/json",
 };
 
 async function joinMatch(playerToken) {
-  const response = await fetch(`${API_HOST}/match/join/${playerToken}`, {
+  const response = await fetch(`${API_HOST}/match/join`, {
     method: "POST",
     headers,
     body: JSON.stringify({
-      clientId: API_CLIENT_ID,
-      clientSecret: API_CLIENT_SECRET,
+      playerToken,
     }),
   });
   return await response.json();
 }
 
-async function updateScore(matchId, playerToken, score) {
+async function updateScore(matchId, playerToken, score, isFinal = false) {
   const response = await fetch(`${API_HOST}/match/${matchId}/score`, {
     method: "POST",
     headers,
     body: JSON.stringify({
       playerToken,
       score,
-      clientId: API_CLIENT_ID,
-      clientSecret: API_CLIENT_SECRET,
-    }),
-  });
-  return await response.json();
-}
-
-async function submitScore(matchId, playerToken, score) {
-  const response = await fetch(`${API_HOST}/match/${matchId}/score/submit`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      playerToken,
-      score,
-      clientId: API_CLIENT_ID,
-      clientSecret: API_CLIENT_SECRET,
+      isFinal,
     }),
   });
   return await response.json();

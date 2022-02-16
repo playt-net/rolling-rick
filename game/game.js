@@ -24,10 +24,10 @@ let bombs;
 let platforms;
 let cursors;
 let score = 0;
-let gameOver = false;
+let isFinal = false;
 let scoreText;
 
-const game = new Phaser.Game(config);
+new Phaser.Game(config);
 
 function preload() {
   this.load.image("sky", "assets/sky.png");
@@ -127,7 +127,7 @@ function create() {
 }
 
 function update() {
-  if (gameOver) {
+  if (isFinal) {
     return;
   }
 
@@ -185,7 +185,7 @@ function hitBomb(player, bomb) {
 
   player.anims.play("turn");
 
-  gameOver = true;
+  isFinal = true;
 
   const div = document.createElement("div");
   div.innerHTML = `<iframe class="rick" width="560" height="315" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?controls=0&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;

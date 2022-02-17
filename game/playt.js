@@ -36,7 +36,7 @@ export function submitScore(score) {
     body: JSON.stringify({
       score,
       playerToken,
-      gameOver: true,
+      isFinal: true,
     }),
   });
 }

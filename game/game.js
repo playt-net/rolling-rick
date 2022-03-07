@@ -1,5 +1,8 @@
 import { joinMatch, submitScore, updateScore } from "./playt.js";
 
+// Random parameter which should be same for all players of this match
+const bombVelocity = 123;
+
 const config = {
   type: Phaser.AUTO,
   width: 800,
@@ -18,14 +21,19 @@ const config = {
   },
 };
 
-let player;
+let myPlayer;
 let stars;
 let bombs;
 let platforms;
 let cursors;
 let score = 0;
+let timeDrain = 0;
 let isFinal = false;
 let scoreText;
+let replay = [];
+
+let others = [];
+let othersReplays = [];
 
 new Phaser.Game(config);
 
@@ -57,11 +65,11 @@ function create() {
   platforms.create(750, 220, "ground");
 
   // The player and its settings
-  player = this.physics.add.sprite(100, 450, "dude");
+  myPlayer = this.physics.add.sprite(100, 450, "dude");
 
   //  Player physics properties. Give the little guy a slight bounce.
-  player.setBounce(0.2);
-  player.setCollideWorldBounds(true);
+  myPlayer.setBounce(0.2);
+  myPlayer.setCollideWorldBounds(true);
 
   //  Our player animations, turning, walking left and walking right.
   this.anims.create({
@@ -94,18 +102,24 @@ function create() {
     setXY: { x: 12, y: 0, stepX: 70 },
   });
 
-  stars.children.iterate(function (child) {
+  stars.children.iterate(function (child, index) {
     //  Give each star a slightly different bounce
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    child.setBounceY(0.5 + Math.sin(index) / 4);
   });
 
   bombs = this.physics.add.group();
 
-  let bomb = bombs.create(400, 32, "bomb");
-  bomb.setBounce(1);
-  bomb.setCollideWorldBounds(true);
-  bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-  bomb.allowGravity = false;
+  let bomb1 = bombs.create(400, 32, "bomb");
+  bomb1.setBounce(1);
+  bomb1.setCollideWorldBounds(true);
+  bomb1.setVelocity(bombVelocity, 20);
+  bomb1.allowGravity = false;
+
+  let bomb2 = bombs.create(200, 32, "bomb");
+  bomb2.setBounce(1);
+  bomb2.setCollideWorldBounds(true);
+  bomb2.setVelocity(-bombVelocity, 20);
+  bomb2.allowGravity = false;
 
   //  The score
   scoreText = this.add.text(16, 16, "score: 0", {
@@ -114,16 +128,36 @@ function create() {
   });
 
   //  Collide the player and the stars with the platforms
-  this.physics.add.collider(player, platforms);
+  this.physics.add.collider(myPlayer, platforms);
   this.physics.add.collider(stars, platforms);
   this.physics.add.collider(bombs, platforms);
 
   //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-  this.physics.add.overlap(player, stars, collectStar, null, this);
+  this.physics.add.overlap(myPlayer, stars, collectStar, null, this);
 
-  this.physics.add.collider(player, bombs, hitBomb, null, this);
+  this.physics.add.collider(myPlayer, bombs, hitBomb, null, this);
 
-  joinMatch();
+  joinMatch()
+    .then((response) => response.json())
+    .then((match) => {
+      const othersScore = match.players
+        .map((player) => `${player.name}: ${player.score}`)
+        .join(" ");
+      this.add.text(16, 4, othersScore, {
+        fontSize: "16px",
+        fill: "#000",
+      });
+
+      match.players.forEach((player) => {
+        const otherPlayer = this.physics.add.sprite(100, 450, "dude");
+        otherPlayer.setBounce(0.2);
+        // otherPlayer.setCollideWorldBounds(true);
+        this.physics.add.collider(otherPlayer, platforms);
+
+        others.push(otherPlayer);
+        othersReplays.push(player.replay);
+      });
+    });
 }
 
 function update() {
@@ -132,22 +166,50 @@ function update() {
   }
 
   if (cursors.left.isDown) {
-    player.setVelocityX(-160);
+    myPlayer.setVelocityX(-160);
 
-    player.anims.play("left", true);
+    myPlayer.anims.play("left", true);
   } else if (cursors.right.isDown) {
-    player.setVelocityX(160);
+    myPlayer.setVelocityX(160);
 
-    player.anims.play("right", true);
+    myPlayer.anims.play("right", true);
   } else {
-    player.setVelocityX(0);
+    myPlayer.setVelocityX(0);
 
-    player.anims.play("turn");
+    myPlayer.anims.play("turn");
   }
 
-  if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-330);
+  if (cursors.up.isDown && myPlayer.body.touching.down) {
+    myPlayer.setVelocityY(-330);
   }
+
+  const position = [myPlayer.x, myPlayer.y, myPlayer.anims.getCurrentKey()];
+  const previous = replay.at(-1);
+  if (!previous || previous[1].toString() !== position.toString()) {
+    replay.push([this.time.now, position]);
+  }
+
+  others.forEach((other, index) => {
+    const replay = othersReplays[index];
+    let nextCommand = replay[0];
+    while (nextCommand && nextCommand[0] <= this.time.now) {
+      replay.splice(0, 1);
+      nextCommand = replay[0];
+    }
+    if (!nextCommand) {
+      return;
+    }
+    const [x, y, animation, finished] = nextCommand[1];
+    other.setX(x);
+    other.setY(y);
+    other.anims.play(animation, true);
+    if (finished) {
+      other.setTint(finished === "win" ? 0x00ff00 : 0xff0000);
+    }
+  });
+
+  timeDrain = Math.round(this.time.now / 1000);
+  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
 }
 
 function collectStar(player, star) {
@@ -155,43 +217,30 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
-  scoreText.setText("Score: " + score);
+  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
 
   if (stars.countActive(true) === 0) {
-    //  A new batch of stars to collect
-    stars.children.iterate(function (child) {
-      child.enableBody(true, child.x, 0, true, true);
-    });
+    this.physics.pause();
+    player.setTint(0x00ff00);
+    player.anims.play("turn");
 
-    let x =
-      player.x < 400
-        ? Phaser.Math.Between(400, 800)
-        : Phaser.Math.Between(0, 400);
+    replay.push([this.time.now, "turn", "win"]);
+    isFinal = true;
 
-    let bomb = bombs.create(x, 16, "bomb");
-    bomb.setBounce(1);
-    bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-    bomb.allowGravity = false;
+    submitScore(score, replay);
   }
 
   updateScore(score);
 }
 
-function hitBomb(player, bomb) {
+function hitBomb(player) {
   this.physics.pause();
-
   player.setTint(0xff0000);
 
   player.anims.play("turn");
+  replay.push([this.time.now, "turn", "loss"]);
 
   isFinal = true;
 
-  const div = document.createElement("div");
-  div.innerHTML = `<iframe class="rick" width="560" height="315" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?controls=0&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  document.body.append(div);
-
-  setTimeout(() => {
-    submitScore(score);
-  }, 3000);
+  submitScore(score, replay);
 }

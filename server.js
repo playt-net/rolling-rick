@@ -3,6 +3,9 @@ dotenv.config();
 
 import express from "express";
 import fetch from "node-fetch";
+import fs from "fs";
+
+const players = JSON.parse(fs.readFileSync("./samples.json", "utf-8"));
 
 const { API_HOST, API_CLIENT_ID, API_CLIENT_SECRET, PORT = 8080 } = process.env;
 
@@ -18,12 +21,15 @@ app.post("/api/match", async (req, res) => {
 
   const match = await joinMatch(playerToken);
   matchIdByPlayerToken[playerToken] = match.id;
-
-  res.json(match);
+  // Temporary fake result
+  const matchWithTimeseries = {
+    players: players,
+  };
+  res.json(matchWithTimeseries);
 });
 
 app.post("/api/score", async (req, res) => {
-  const { score, playerToken, isFinal } = req.body;
+  const { score, replay, playerToken, isFinal } = req.body;
 
   const matchId = matchIdByPlayerToken[playerToken];
 

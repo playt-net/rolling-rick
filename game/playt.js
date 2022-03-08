@@ -27,7 +27,7 @@ export function updateScore(score) {
   });
 }
 
-export function submitScore(score) {
+export function submitScore(score, replay) {
   return fetch(`/api/score`, {
     method: "POST",
     headers: {
@@ -35,6 +35,7 @@ export function submitScore(score) {
     },
     body: JSON.stringify({
       score,
+      replay,
       playerToken,
       isFinal: true,
     }),

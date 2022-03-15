@@ -1,4 +1,10 @@
-import { joinMatch, submitScore, updateScore } from "./playt.js";
+import {
+  joinMatch,
+  matchId,
+  playerToken,
+  submitScore,
+  updateScore,
+} from "./playt.js";
 
 // Random parameter which should be same for all players of this match
 const bombVelocity = 123;
@@ -21,6 +27,7 @@ const config = {
   },
 };
 
+let socket;
 let myPlayer;
 let stars;
 let bombs;
@@ -30,6 +37,7 @@ let score = 0;
 let timeDrain = 0;
 let isFinal = false;
 let scoreText;
+let othersScoreText;
 let replay = [];
 
 let others = [];
@@ -137,65 +145,112 @@ function create() {
 
   this.physics.add.collider(myPlayer, bombs, hitBomb, null, this);
 
-  joinMatch()
-    .then((response) => response.json())
-    .then((match) => {
-      const othersScore = match.players
-        .map((player) => `${player.name}: ${player.score}`)
-        .join(" ");
-      this.add.text(16, 4, othersScore, {
-        fontSize: "16px",
-        fill: "#000",
-      });
+  othersScoreText = this.add.text(16, 4, "", {
+    fontSize: "16px",
+    fill: "#000",
+  });
 
-      match.players.forEach((player) => {
-        const otherPlayer = this.physics.add.sprite(100, 450, "dude");
-        otherPlayer.setBounce(0.2);
-        // otherPlayer.setCollideWorldBounds(true);
-        this.physics.add.collider(otherPlayer, platforms);
+  // joinMatch();
 
-        others.push(otherPlayer);
-        othersReplays.push(player.replay);
-      });
+  socket = io("ws://localhost:3000", {
+    query: {
+      playerToken: playerToken,
+      matchId: matchId,
+    },
+  });
+
+  socket.on("connect", (event) => {
+    console.log("Connected", event);
+    this.physics.start();
+  });
+  socket.on("disconnect", (event) => {
+    console.log("Disonnected", event);
+    this.physics.pause();
+  });
+
+  socket.on("replays", (replays) => {
+    console.log(replays);
+    othersReplays = replays.filter(
+      (replay) => replay.playerToken !== playerToken
+    );
+    const othersScore = othersReplays
+      .map((replay) => `${replay.playerToken}: -`)
+      .join(" ");
+    othersScoreText.setText(othersScore);
+
+    othersReplays.forEach(() => {
+      const otherPlayer = this.physics.add.sprite(100, 450, "dude");
+      otherPlayer.setTint(0x333333);
+      otherPlayer.setBounce(0.2);
+      // otherPlayer.setCollideWorldBounds(true);
+      this.physics.add.collider(otherPlayer, platforms);
+
+      others.push(otherPlayer);
     });
+  });
+
+  socket.on("joined", (replay) => {
+    console.log("Player joined", replay.playerToken);
+    const otherReplay = othersReplays.find(
+      (otherReplay) => otherReplay.playerToken === replay.playerToken
+    );
+    if (!otherReplay) {
+      othersReplays.push(replay);
+      const otherPlayer = this.physics.add.sprite(100, 450, "dude");
+      otherPlayer.setTint(0x333333);
+      otherPlayer.setBounce(0.2);
+      this.physics.add.collider(otherPlayer, platforms);
+
+      others.push(otherPlayer);
+    } else {
+      otherReplay.chunks = replay.chunks;
+    }
+  });
+
+  socket.on("chunk", ({ playerToken, chunk }) => {
+    const replay = othersReplays.find(
+      (replay) => replay.playerToken === playerToken
+    );
+    if (replay) {
+      replay.chunks.push(chunk);
+    }
+  });
 }
 
 function update() {
-  if (isFinal) {
-    return;
-  }
+  if (!isFinal) {
+    if (cursors.left.isDown) {
+      myPlayer.setVelocityX(-160);
 
-  if (cursors.left.isDown) {
-    myPlayer.setVelocityX(-160);
+      myPlayer.anims.play("left", true);
+    } else if (cursors.right.isDown) {
+      myPlayer.setVelocityX(160);
 
-    myPlayer.anims.play("left", true);
-  } else if (cursors.right.isDown) {
-    myPlayer.setVelocityX(160);
+      myPlayer.anims.play("right", true);
+    } else {
+      myPlayer.setVelocityX(0);
 
-    myPlayer.anims.play("right", true);
-  } else {
-    myPlayer.setVelocityX(0);
+      myPlayer.anims.play("turn");
+    }
 
-    myPlayer.anims.play("turn");
-  }
-
-  if (cursors.up.isDown && myPlayer.body.touching.down) {
-    myPlayer.setVelocityY(-330);
-  }
-
-  const position = [myPlayer.x, myPlayer.y, myPlayer.anims.getCurrentKey()];
-  const previous = replay.at(-1);
-  if (!previous || previous[1].toString() !== position.toString()) {
-    replay.push([this.time.now, position]);
+    if (cursors.up.isDown && myPlayer.body.touching.down) {
+      myPlayer.setVelocityY(-330);
+    }
+    const position = [myPlayer.x, myPlayer.y, myPlayer.anims.getCurrentKey()];
+    const previous = replay.at(-1);
+    if (!previous || previous[1].toString() !== position.toString()) {
+      socket.emit("chunk", [this.time.now, position, null, score]);
+      replay.push([this.time.now, position, score]);
+    }
   }
 
   others.forEach((other, index) => {
     const replay = othersReplays[index];
-    let nextCommand = replay[0];
-    while (nextCommand && nextCommand[0] <= this.time.now) {
-      replay.splice(0, 1);
-      nextCommand = replay[0];
-    }
+    let nextCommand = replay.chunks[0];
+    // while (nextCommand && nextCommand[0] <= this.time.now) {
+    //   replay.chunks.splice(0, 1);
+    //   nextCommand = replay.chunks[0];
+    // }
     if (!nextCommand) {
       return;
     }
@@ -206,10 +261,18 @@ function update() {
     if (finished) {
       other.setTint(finished === "win" ? 0x00ff00 : 0xff0000);
     }
+    const othersScore = othersReplays
+      .map(
+        (replay) => `${replay.playerToken}: ${replay.chunks.at(-1)?.[3] || 0}`
+      )
+      .join(" ");
+    othersScoreText.setText(othersScore);
+
+    replay.chunks.splice(0, 1);
   });
 
   timeDrain = Math.round(this.time.now / 1000);
-  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
+  scoreText.setText(`Score: ${score}`);
 }
 
 function collectStar(player, star) {
@@ -217,30 +280,35 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
-  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
+  scoreText.setText(`Score: ${score}`);
 
   if (stars.countActive(true) === 0) {
-    this.physics.pause();
+    // this.physics.pause();
     player.setTint(0x00ff00);
+    player.setVelocityX(0);
     player.anims.play("turn");
 
+    const position = [player.x, player.y, player.anims.getCurrentKey()];
+    socket.emit("chunk", [this.time.now, position, "win", score]);
     replay.push([this.time.now, "turn", "win"]);
     isFinal = true;
 
-    submitScore(score, replay);
+    // submitScore(score, replay);
   }
 
-  updateScore(score);
+  // updateScore(score);
 }
 
 function hitBomb(player) {
-  this.physics.pause();
+  // this.physics.pause();
   player.setTint(0xff0000);
-
+  player.setVelocityX(0);
   player.anims.play("turn");
+  const position = [player.x, player.y, player.anims.getCurrentKey()];
+  socket.emit("chunk", [this.time.now, position, "loss", score]);
   replay.push([this.time.now, "turn", "loss"]);
 
   isFinal = true;
 
-  submitScore(score, replay);
+  // submitScore(score, replay);
 }

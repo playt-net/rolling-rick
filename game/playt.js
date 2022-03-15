@@ -1,6 +1,7 @@
 const params = new URLSearchParams(window.location.search);
 
-const playerToken = params.get("playerToken");
+export const playerToken = params.get("playerToken");
+export const matchId = params.get("matchId");
 
 export function joinMatch() {
   return fetch(`/api/match`, {

@@ -1,11 +1,9 @@
-// @ts-check
 import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
 import fs from "fs";
-import playt from "@playt/client";
-const { PlaytClient } = playt;
+import { components, PlaytClient } from "@playt/client";
 
 const players = JSON.parse(fs.readFileSync("./samples.json", "utf-8"));
 
@@ -18,12 +16,15 @@ const app = express();
 app.use(express.json());
 app.use(express.static("game"));
 
-const matchIdByPlayerToken = {};
+const matchIdByPlayerToken: {
+  [playerToken: string]: string;
+} = {};
 
 app.post("/api/match", async (req, res) => {
   const { playerToken } = req.body;
 
-  const { data: match } = await client.postMatchJoin({ playerToken });
+  const { data } = await client.postMatchJoin({ playerToken });
+  const match = data as components["schemas"]["MatchResponse"];
   matchIdByPlayerToken[playerToken] = match.id;
   // Temporary fake result
   const matchWithTimeseries = {
@@ -53,3 +54,5 @@ app.post("/api/score", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}`);
 });
+
+export {};

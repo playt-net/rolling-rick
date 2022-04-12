@@ -1,13 +1,17 @@
+// @ts-check
 import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import fetch from "node-fetch";
 import fs from "fs";
+import playt from "@playt/client";
+const { PlaytClient } = playt;
 
 const players = JSON.parse(fs.readFileSync("./samples.json", "utf-8"));
 
-const { API_HOST, API_CLIENT_ID, API_CLIENT_SECRET, PORT = 8080 } = process.env;
+const { API_HOST, API_KEY, PORT = 8080 } = process.env;
+
+const client = PlaytClient({ apiKey: API_KEY, apiHost: API_HOST });
 
 const app = express();
 
@@ -19,7 +23,7 @@ const matchIdByPlayerToken = {};
 app.post("/api/match", async (req, res) => {
   const { playerToken } = req.body;
 
-  const match = await joinMatch(playerToken);
+  const { data: match } = await client.postMatchJoin({ playerToken });
   matchIdByPlayerToken[playerToken] = match.id;
   // Temporary fake result
   const matchWithTimeseries = {
@@ -37,43 +41,15 @@ app.post("/api/score", async (req, res) => {
     res.status(400).end();
     return;
   }
-  const result = await updateScore(matchId, playerToken, score, isFinal);
+  const result = await client.postScore({
+    id: matchId,
+    playerToken,
+    score,
+    final: isFinal,
+  });
   res.json(result);
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}`);
 });
-
-const authToken = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString(
-  "base64"
-);
-const headers = {
-  Accept: "application/json",
-  Authorization: `Basic ${authToken}`,
-  "Content-Type": "application/json",
-};
-
-async function joinMatch(playerToken) {
-  const response = await fetch(`${API_HOST}/match/join`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      playerToken,
-    }),
-  });
-  return await response.json();
-}
-
-async function updateScore(matchId, playerToken, score, isFinal = false) {
-  const response = await fetch(`${API_HOST}/match/${matchId}/score`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      playerToken,
-      score,
-      isFinal,
-    }),
-  });
-  return await response.json();
-}

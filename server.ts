@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import "./fetch-polyfill";
+
 import express from "express";
 import fs from "fs";
 import { components, PlaytClient } from "@playt/client";
@@ -20,17 +22,22 @@ const matchIdByPlayerToken: {
   [playerToken: string]: string;
 } = {};
 
-app.post("/api/match", async (req, res) => {
-  const { playerToken } = req.body;
+app.post("/api/match", async (req, res, next) => {
+  try {
+    const { playerToken } = req.body;
 
-  const { data } = await client.postMatchJoin({ playerToken });
-  const match = data as components["schemas"]["MatchResponse"];
-  matchIdByPlayerToken[playerToken] = match.id;
-  // Temporary fake result
-  const matchWithTimeseries = {
-    players: players,
-  };
-  res.json(matchWithTimeseries);
+    const { data } = await client.postMatchJoin({ playerToken });
+    const match = data as components["schemas"]["MatchResponse"];
+    matchIdByPlayerToken[playerToken] = match.id;
+    // Temporary fake result
+    const matchWithTimeseries = {
+      players: players,
+    };
+    res.json(matchWithTimeseries);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
 app.post("/api/score", async (req, res) => {
@@ -42,11 +49,12 @@ app.post("/api/score", async (req, res) => {
     res.status(400).end();
     return;
   }
+
   const result = await client.postScore({
     id: matchId,
     playerToken,
     score,
-    final: isFinal,
+    isFinal,
   });
   res.json(result);
 });

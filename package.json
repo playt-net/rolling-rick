@@ -16,15 +16,16 @@
   },
   "homepage": "https://github.com/playt-net/rolling-rick#readme",
   "dependencies": {
-    "@playt/client": "1.5.0",
+    "@playt/client": "1.6.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "http-proxy": "^1.18.1",
-    "node-fetch": "^3.2.0",
+    "node-fetch": "^2.6.7",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   },
   "devDependencies": {
-    "@types/express": "^4.17.13"
+    "@types/express": "^4.17.13",
+    "@types/node-fetch": "^2.6.1"
   }
 }

@@ -50,13 +50,13 @@ app.post("/api/score", async (req, res) => {
     return;
   }
 
-  const result = await client.postScore({
+  const { status, data } = await client.postScore({
     id: matchId,
     playerToken,
     score,
-    isFinal,
+    finalSnapshot: isFinal,
   });
-  res.json(result);
+  res.status(status).json(data);
 });
 
 app.listen(PORT, () => {

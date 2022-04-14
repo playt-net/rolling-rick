@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/playt-net/rolling-rick#readme",
   "dependencies": {
-    "@playt/client": "1.6.1",
+    "@playt/client": "1.6.2",
     "dotenv": "16.0.0",
     "express": "4.17.2",
     "http-proxy": "1.18.1",

@@ -37,7 +37,7 @@ export function submitScore(score, replay) {
       score,
       replay,
       playerToken,
-      isFinal: true,
+      finalSnapshot: true,
     }),
   });
 }

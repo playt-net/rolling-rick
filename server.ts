@@ -41,7 +41,7 @@ app.post("/api/match", async (req, res, next) => {
 });
 
 app.post("/api/score", async (req, res) => {
-  const { score, replay, playerToken, isFinal } = req.body;
+  const { score, replay, playerToken, finalSnapshot } = req.body;
 
   const matchId = matchIdByPlayerToken[playerToken];
 
@@ -54,7 +54,7 @@ app.post("/api/score", async (req, res) => {
     id: matchId,
     playerToken,
     score,
-    finalSnapshot: isFinal,
+    finalSnapshot,
   });
   res.status(status).json(data);
 });

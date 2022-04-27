@@ -30,9 +30,14 @@ app.post("/api/match", async (req, res, next) => {
       })
     );
     const replayResponses = await Promise.all(promises);
-    const replays = replayResponses.map((replayReponse) =>
-      JSON.parse(replayReponse.data.payload)
-    );
+    const replays = replayResponses.map((replayReponse) => {
+      const replay = JSON.parse(replayReponse.data.payload);
+      return {
+        name: "Bob",
+        score: replay.score,
+        commands: replay.commands,
+      };
+    });
     res.json(replays);
   } catch (e) {
     console.error(e);
@@ -55,7 +60,6 @@ app.post("/api/score", async (req, res) => {
       matchId: match.id,
       playerToken,
       payload: JSON.stringify({
-        name: "Bob",
         score,
         commands: replay,
       }),

@@ -224,7 +224,7 @@ function collectStar(player, star) {
     player.setTint(0x00ff00);
     player.anims.play("turn");
 
-    replay.push([this.time.now, "turn", "win"]);
+    replay.push([this.time.now, [player.x, player.y, "turn", "win"]]);
     isFinal = true;
 
     submitScore(score, replay);
@@ -238,7 +238,7 @@ function hitBomb(player) {
   player.setTint(0xff0000);
 
   player.anims.play("turn");
-  replay.push([this.time.now, "turn", "loss"]);
+  replay.push([this.time.now, [player.x, player.y, "turn", "loss"]]);
 
   isFinal = true;
 

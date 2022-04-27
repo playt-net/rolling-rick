@@ -33,7 +33,7 @@ let scoreText;
 let replay = [];
 
 let others = [];
-let othersReplays = [];
+let othersCommands = [];
 
 new Phaser.Game(config);
 
@@ -139,23 +139,23 @@ function create() {
 
   joinMatch()
     .then((response) => response.json())
-    .then((match) => {
-      const othersScore = match.players
-        .map((player) => `${player.name}: ${player.score}`)
+    .then((replays) => {
+      const othersScore = replays
+        .map((replay) => `${replay.name}: ${replay.score}`)
         .join(" ");
       this.add.text(16, 4, othersScore, {
         fontSize: "16px",
         fill: "#000",
       });
 
-      match.players.forEach((player) => {
+      replays.forEach((replay) => {
         const otherPlayer = this.physics.add.sprite(100, 450, "dude");
         otherPlayer.setBounce(0.2);
         // otherPlayer.setCollideWorldBounds(true);
         this.physics.add.collider(otherPlayer, platforms);
 
         others.push(otherPlayer);
-        othersReplays.push(player.replay);
+        othersCommands.push(replay.commands);
       });
     });
 }
@@ -190,11 +190,11 @@ function update() {
   }
 
   others.forEach((other, index) => {
-    const replay = othersReplays[index];
-    let nextCommand = replay[0];
+    const commands = othersCommands[index];
+    let nextCommand = commands[0];
     while (nextCommand && nextCommand[0] <= this.time.now) {
-      replay.splice(0, 1);
-      nextCommand = replay[0];
+      commands.splice(0, 1);
+      nextCommand = commands[0];
     }
     if (!nextCommand) {
       return;

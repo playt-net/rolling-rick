@@ -217,7 +217,8 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
-  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
+  const totalScore = Math.round(score - timeDrain)
+  scoreText.setText(`Score: ${totalScore}`);
 
   if (stars.countActive(true) === 0) {
     this.physics.pause();
@@ -227,10 +228,10 @@ function collectStar(player, star) {
     replay.push([this.time.now, [player.x, player.y, "turn", "win"]]);
     isFinal = true;
 
-    submitScore(score, replay);
+    submitScore(totalScore, replay);
+  } else {
+    updateScore(totalScore);
   }
-
-  updateScore(score);
 }
 
 function hitBomb(player) {
@@ -241,6 +242,6 @@ function hitBomb(player) {
   replay.push([this.time.now, [player.x, player.y, "turn", "loss"]]);
 
   isFinal = true;
-
-  submitScore(score, replay);
+  const totalScore = Math.round(score - timeDrain)
+  submitScore(totalScore, replay);
 }

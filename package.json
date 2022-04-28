@@ -10,7 +10,7 @@
     "cjs": "node src/cjs/server.js",
     "esm": "node src/esm/server.js",
     "ts": "ts-node src/ts/server.ts",
-    "start": "npm run ts"
+    "start": "npm run esm"
   },
   "repository": {
     "type": "git",

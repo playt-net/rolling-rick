@@ -7,7 +7,7 @@ import { components, PlaytClient } from "@playt/client";
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
-const client = PlaytClient({ apiKey: API_KEY, apiHost: API_HOST });
+const client = new PlaytClient({ apiKey: API_KEY, apiHost: API_HOST });
 
 const app = express();
 

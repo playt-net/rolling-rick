@@ -17,7 +17,7 @@ app.use(express.static("game"));
 
 const matchByPlayerToken = {};
 
-app.post("/api/match", async (req, res, next) => {
+app.post("/api/match", async (req, res) => {
   try {
     const { playerToken } = req.body;
 
@@ -33,45 +33,73 @@ app.post("/api/match", async (req, res, next) => {
     const replays = replayResponses.map((replayReponse) => {
       const replay = JSON.parse(replayReponse.data.payload);
       return {
-        name: "Bob",
+        name: replayReponse.data.participant.username,
         score: replay.score,
         commands: replay.commands,
       };
     });
     res.json(replays);
+  } catch (error) {
+    const { status, statusText } = error;
+    res.status(status).json({
+      message: statusText,
+    });
+  }
+});
+
+app.post("/api/match/abort", async (req, res) => {
+  try {
+    const { playerToken } = req.body;
+    const match = matchByPlayerToken[playerToken];
+    if (!match) {
+      res.status(404).json({ message: "Match not found" });
+      return;
+    }
+    await client.postAbort({
+      id: match.id,
+      playerToken,
+    });
+    res.status(200).json({});
+  } catch (error) {
+    const { status, statusText } = error;
+    res.status(status).json({
+      message: statusText,
+    });
+  }
+});
+
+app.post("/api/score", async (req, res, next) => {
+  try {
+    const { score, replay, playerToken, finalSnapshot } = req.body;
+
+    const match = matchByPlayerToken[playerToken];
+
+    if (!match) {
+      res.status(400).end();
+      return;
+    }
+
+    if (finalSnapshot) {
+      await client.postReplay({
+        matchId: match.id,
+        playerToken,
+        payload: JSON.stringify({
+          score,
+          commands: replay,
+        }),
+      });
+    }
+    const { status, data } = await client.postScore({
+      id: match.id,
+      playerToken,
+      score,
+      finalSnapshot,
+    });
+    res.status(status).json(data);
   } catch (e) {
     console.error(e);
     next(e);
   }
-});
-
-app.post("/api/score", async (req, res) => {
-  const { score, replay, playerToken, finalSnapshot } = req.body;
-
-  const match = matchByPlayerToken[playerToken];
-
-  if (!match) {
-    res.status(400).end();
-    return;
-  }
-
-  if (finalSnapshot) {
-    await client.postReplay({
-      matchId: match.id,
-      playerToken,
-      payload: JSON.stringify({
-        score,
-        commands: replay,
-      }),
-    });
-  }
-  const { status, data } = await client.postScore({
-    id: match.id,
-    playerToken,
-    score,
-    finalSnapshot,
-  });
-  res.status(status).json(data);
 });
 
 app.listen(PORT, () => {

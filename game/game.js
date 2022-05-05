@@ -48,7 +48,7 @@ function preload() {
   });
 }
 
-function create() {
+async function create() {
   //  A simple background for our game
   this.add.image(400, 300, "sky");
 
@@ -120,7 +120,6 @@ function create() {
   bomb2.setCollideWorldBounds(true);
   bomb2.setVelocity(-bombVelocity, 20);
   bomb2.allowGravity = false;
-
   //  The score
   scoreText = this.add.text(16, 16, "score: 0", {
     fontSize: "32px",
@@ -137,27 +136,37 @@ function create() {
 
   this.physics.add.collider(myPlayer, bombs, hitBomb, null, this);
 
-  joinMatch()
-    .then((response) => response.json())
-    .then((replays) => {
-      const othersScore = replays
-        .map((replay) => `${replay.name}: ${replay.score}`)
-        .join(" ");
-      this.add.text(16, 4, othersScore, {
-        fontSize: "16px",
-        fill: "#000",
-      });
+  try {
+    const response = await joinMatch();
+    const result = await response.json();
+    if (!response.ok) {
+      throw result;
+    }
 
-      replays.forEach((replay) => {
-        const otherPlayer = this.physics.add.sprite(100, 450, "dude");
-        otherPlayer.setBounce(0.2);
-        // otherPlayer.setCollideWorldBounds(true);
-        this.physics.add.collider(otherPlayer, platforms);
-
-        others.push(otherPlayer);
-        othersCommands.push(replay.commands);
-      });
+    const othersScore = result
+      .map((replay) => `${replay.name}: ${replay.score}`)
+      .join(" ");
+    this.add.text(16, 4, othersScore, {
+      fontSize: "16px",
+      fill: "#000",
     });
+
+    result.forEach((replay) => {
+      const otherPlayer = this.physics.add.sprite(100, 450, "dude");
+      otherPlayer.setBounce(0.2);
+      // otherPlayer.setCollideWorldBounds(true);
+      this.physics.add.collider(otherPlayer, platforms);
+
+      others.push(otherPlayer);
+      othersCommands.push(replay.commands);
+    });
+  } catch (error) {
+    this.scene.pause();
+    this.add.text(16, 550, error.message, {
+      fontSize: "32px",
+      fill: "orange",
+    });
+  }
 }
 
 function update() {
@@ -217,7 +226,7 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
-  const totalScore = Math.round(score - timeDrain)
+  const totalScore = Math.round(score - timeDrain);
   scoreText.setText(`Score: ${totalScore}`);
 
   if (stars.countActive(true) === 0) {
@@ -242,6 +251,6 @@ function hitBomb(player) {
   replay.push([this.time.now, [player.x, player.y, "turn", "loss"]]);
 
   isFinal = true;
-  const totalScore = Math.round(score - timeDrain)
+  const totalScore = Math.round(score - timeDrain);
   submitScore(totalScore, replay);
 }

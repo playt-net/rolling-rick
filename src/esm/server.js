@@ -33,7 +33,7 @@ app.post("/api/match", async (req, res, next) => {
     const replays = replayResponses.map((replayReponse) => {
       const replay = JSON.parse(replayReponse.data.payload);
       return {
-        name: "Bob",
+        name: replayReponse.data.participant.username,
         score: replay.score,
         commands: replay.commands,
       };

@@ -3,7 +3,7 @@ dotenv.config();
 
 import "./fetch-polyfill.ts";
 import express from "express";
-import { components, PlaytClient } from "@playt/client";
+import { ApiError, components, PlaytClient } from "@playt/client";
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
@@ -18,7 +18,7 @@ const matchByPlayerToken: {
   [playerToken: string]: components["schemas"]["MatchResponse"];
 } = {};
 
-app.post("/api/match", async (req, res, next) => {
+app.post("/api/match", async (req, res) => {
   try {
     const { playerToken } = req.body;
 
@@ -40,39 +40,46 @@ app.post("/api/match", async (req, res, next) => {
       };
     });
     res.json(replays);
+  } catch (error) {
+    const { status, statusText } = error as ApiError;
+    res.status(status).json({
+      message: statusText,
+    });
+  }
+});
+
+app.post("/api/score", async (req, res, next) => {
+  try {
+    const { score, replay, playerToken, finalSnapshot } = req.body;
+
+    const match = matchByPlayerToken[playerToken];
+
+    if (!match) {
+      res.status(400).end();
+      return;
+    }
+
+    if (finalSnapshot) {
+      await client.postReplay({
+        matchId: match.id,
+        playerToken,
+        payload: JSON.stringify({
+          score,
+          commands: replay,
+        }),
+      });
+    }
+    const { status, data } = await client.postScore({
+      id: match.id,
+      playerToken,
+      score,
+      finalSnapshot,
+    });
+    res.status(status).json(data);
   } catch (e) {
     console.error(e);
     next(e);
   }
-});
-
-app.post("/api/score", async (req, res) => {
-  const { score, replay, playerToken, finalSnapshot } = req.body;
-
-  const match = matchByPlayerToken[playerToken];
-
-  if (!match) {
-    res.status(400).end();
-    return;
-  }
-
-  if (finalSnapshot) {
-    await client.postReplay({
-      matchId: match.id,
-      playerToken,
-      payload: JSON.stringify({
-        score,
-        commands: replay,
-      }),
-    });
-  }
-  const { status, data } = await client.postScore({
-    id: match.id,
-    playerToken,
-    score,
-    finalSnapshot,
-  });
-  res.status(status).json(data);
 });
 
 app.listen(PORT, () => {

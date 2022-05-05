@@ -4,7 +4,7 @@ dotenv.config();
 
 import "./fetch-polyfill.js";
 import express from "express";
-import { PlaytClient } from "@playt/client";
+import { ApiError, PlaytClient } from "@playt/client";
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
@@ -40,10 +40,18 @@ app.post("/api/match", async (req, res) => {
     });
     res.json(replays);
   } catch (error) {
-    const { status, statusText } = error;
-    res.status(status).json({
-      message: statusText,
-    });
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
 });
 
@@ -61,14 +69,22 @@ app.post("/api/match/abort", async (req, res) => {
     });
     res.status(200).json({});
   } catch (error) {
-    const { status, statusText } = error;
-    res.status(status).json({
-      message: statusText,
-    });
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
 });
 
-app.post("/api/score", async (req, res, next) => {
+app.post("/api/score", async (req, res) => {
   try {
     const { score, replay, playerToken, finalSnapshot } = req.body;
 
@@ -96,9 +112,18 @@ app.post("/api/score", async (req, res, next) => {
       finalSnapshot,
     });
     res.status(status).json(data);
-  } catch (e) {
-    console.error(e);
-    next(e);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
 });
 

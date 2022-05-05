@@ -4,7 +4,7 @@ dotenv.config();
 
 require("./fetch-polyfill.js");
 const express = require("express");
-const { PlaytClient } = require("@playt/client");
+const { PlaytClient, ApiError } = require("@playt/client");
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
@@ -17,7 +17,7 @@ app.use(express.static("game"));
 
 const matchByPlayerToken = {};
 
-app.post("/api/match", async (req, res, next) => {
+app.post("/api/match", async (req, res) => {
   try {
     const { playerToken } = req.body;
 
@@ -33,45 +33,99 @@ app.post("/api/match", async (req, res, next) => {
     const replays = replayResponses.map((replayReponse) => {
       const replay = JSON.parse(replayReponse.data.payload);
       return {
-        name: "Bob",
+        name: replayReponse.data.participant.username,
         score: replay.score,
         commands: replay.commands,
       };
     });
     res.json(replays);
-  } catch (e) {
-    console.error(e);
-    next(e);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  }
+});
+
+app.post("/api/match/abort", async (req, res) => {
+  try {
+    const { playerToken } = req.body;
+    const match = matchByPlayerToken[playerToken];
+    if (!match) {
+      res.status(404).json({ message: "Match not found" });
+      return;
+    }
+    await client.postAbort({
+      id: match.id,
+      playerToken,
+    });
+    res.status(200).json({});
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
 });
 
 app.post("/api/score", async (req, res) => {
-  const { score, replay, playerToken, finalSnapshot } = req.body;
+  try {
+    const { score, replay, playerToken, finalSnapshot } = req.body;
 
-  const match = matchByPlayerToken[playerToken];
+    const match = matchByPlayerToken[playerToken];
 
-  if (!match) {
-    res.status(400).end();
-    return;
-  }
+    if (!match) {
+      res.status(400).end();
+      return;
+    }
 
-  if (finalSnapshot) {
-    await client.postReplay({
-      matchId: match.id,
+    if (finalSnapshot) {
+      await client.postReplay({
+        matchId: match.id,
+        playerToken,
+        payload: JSON.stringify({
+          score,
+          commands: replay,
+        }),
+      });
+    }
+    const { status, data } = await client.postScore({
+      id: match.id,
       playerToken,
-      payload: JSON.stringify({
-        score,
-        commands: replay,
-      }),
+      score,
+      finalSnapshot,
     });
+    res.status(status).json(data);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
-  const { status, data } = await client.postScore({
-    id: match.id,
-    playerToken,
-    score,
-    finalSnapshot,
-  });
-  res.status(status).json(data);
 });
 
 app.listen(PORT, () => {

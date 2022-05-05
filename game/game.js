@@ -1,4 +1,4 @@
-import { joinMatch, submitScore, updateScore } from "./playt.js";
+import { abortMatch, joinMatch, submitScore, updateScore } from "./playt.js";
 
 // Random parameter which should be same for all players of this match
 const bombVelocity = 123;
@@ -27,7 +27,6 @@ let bombs;
 let platforms;
 let cursors;
 let score = 0;
-let timeDrain = 0;
 let isFinal = false;
 let scoreText;
 let replay = [];
@@ -126,6 +125,16 @@ async function create() {
     fill: "#000",
   });
 
+  const abortText = this.add.text(710, 550, "ABORT", {
+    fontSize: "26px",
+    fill: "white",
+  });
+  abortText.setInteractive();
+  abortText.on("pointerdown", () => {
+    this.physics.pause();
+    abortMatch();
+  });
+
   //  Collide the player and the stars with the platforms
   this.physics.add.collider(myPlayer, platforms);
   this.physics.add.collider(stars, platforms);
@@ -217,8 +226,7 @@ function update() {
     }
   });
 
-  timeDrain = Math.round(this.time.now / 1000);
-  scoreText.setText(`Score: ${Math.round(score - timeDrain)}`);
+  scoreText.setText(`Score: ${score}`);
 }
 
 function collectStar(player, star) {
@@ -226,8 +234,7 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
-  const totalScore = Math.round(score - timeDrain);
-  scoreText.setText(`Score: ${totalScore}`);
+  scoreText.setText(`Score: ${score}`);
 
   if (stars.countActive(true) === 0) {
     this.physics.pause();
@@ -237,9 +244,9 @@ function collectStar(player, star) {
     replay.push([this.time.now, [player.x, player.y, "turn", "win"]]);
     isFinal = true;
 
-    submitScore(totalScore, replay);
+    submitScore(score, replay);
   } else {
-    updateScore(totalScore);
+    updateScore(score);
   }
 }
 
@@ -251,6 +258,5 @@ function hitBomb(player) {
   replay.push([this.time.now, [player.x, player.y, "turn", "loss"]]);
 
   isFinal = true;
-  const totalScore = Math.round(score - timeDrain);
-  submitScore(totalScore, replay);
+  submitScore(score, replay);
 }

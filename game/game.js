@@ -201,7 +201,7 @@ function update() {
     myPlayer.setVelocityY(-330);
   }
 
-  const position = [myPlayer.x, myPlayer.y, myPlayer.anims.getCurrentKey()];
+  const position = [myPlayer.x, myPlayer.y, myPlayer.anims.getName()];
   const previous = replay.at(-1);
   if (!previous || previous[1].toString() !== position.toString()) {
     replay.push([this.time.now, position]);

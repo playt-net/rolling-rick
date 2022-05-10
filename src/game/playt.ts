@@ -1,9 +1,14 @@
 const params = new URLSearchParams(window.location.search);
 
+export type Replay = {
+  name: string;
+  score: any;
+  commands: any;
+};
 const playerToken = params.get("playerToken");
 
-export function joinMatch() {
-  return fetch(`/api/match`, {
+export async function joinMatch() {
+  const response = await fetch(`/api/match`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -12,9 +17,15 @@ export function joinMatch() {
       playerToken,
     }),
   });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw result;
+  }
+  return result as Replay[];
 }
 
-export function updateScore(score) {
+export function updateScore(score: number) {
   return fetch(`/api/score`, {
     method: "POST",
     headers: {
@@ -27,7 +38,7 @@ export function updateScore(score) {
   });
 }
 
-export function submitScore(score, replay) {
+export function submitScore(score: number, commands: Replay["commands"]) {
   return fetch(`/api/score`, {
     method: "POST",
     headers: {
@@ -35,7 +46,7 @@ export function submitScore(score, replay) {
     },
     body: JSON.stringify({
       score,
-      replay,
+      commands,
       playerToken,
       finalSnapshot: true,
     }),

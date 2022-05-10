@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "./game",
+    "rootDir": "./src/game",
+    "noEmit": false,
+    "sourceMap": true
+  },
+  "include": ["src/game"],
+  "exclude": []
+}

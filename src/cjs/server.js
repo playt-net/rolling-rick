@@ -8,6 +8,10 @@ const { PlaytClient, ApiError } = require("@playt/client");
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
+if (!API_HOST || !API_KEY) {
+  throw new Error("Missing API_HOST or API_KEY environment variables");
+}
+
 const client = new PlaytClient({ apiKey: API_KEY, apiHost: API_HOST });
 
 const app = express();
@@ -86,7 +90,7 @@ app.post("/api/match/abort", async (req, res) => {
 
 app.post("/api/score", async (req, res) => {
   try {
-    const { score, replay, playerToken, finalSnapshot } = req.body;
+    const { score, commands, playerToken, finalSnapshot } = req.body;
 
     const match = matchByPlayerToken[playerToken];
 
@@ -101,7 +105,7 @@ app.post("/api/score", async (req, res) => {
         playerToken,
         payload: JSON.stringify({
           score,
-          commands: replay,
+          commands: commands,
         }),
       });
     }

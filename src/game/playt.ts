@@ -1,3 +1,5 @@
+import type { components } from "@playt/client";
+
 const params = new URLSearchParams(window.location.search);
 
 export type Replay = {
@@ -5,7 +7,17 @@ export type Replay = {
   score: any;
   commands: any;
 };
-const playerToken = params.get("playerToken");
+export const playerToken = params.get("playerToken");
+
+export async function getMatch() {
+  const response = await fetch(`/api/match?playerToken=${playerToken}`);
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw result;
+  }
+  return result as components["schemas"]["MatchResponse"];
+}
 
 export async function joinMatch() {
   const response = await fetch(`/api/match`, {
@@ -22,7 +34,10 @@ export async function joinMatch() {
   if (!response.ok) {
     throw result;
   }
-  return result as Replay[];
+  return result as {
+    match: components["schemas"]["MatchResponse"];
+    replays: Replay[];
+  };
 }
 
 export function updateScore(score: number) {

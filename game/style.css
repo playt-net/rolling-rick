@@ -1,9 +1,4 @@
 body {
   margin: 0;
-}
-
-.rick {
-  position: fixed;
-  inset: 10%;
-  z-index: 1;
+  background-color: #0e1217;
 }

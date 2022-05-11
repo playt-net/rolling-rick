@@ -1,4 +1,11 @@
-import { getMatch, joinMatch, playerToken } from "../playt.js";
+import { components } from "@playt/client";
+import {
+  getMatch,
+  getReplay,
+  joinMatch,
+  playerToken,
+  Replay,
+} from "../playt.js";
 import PlayingScene from "./playing.js";
 
 export default class LoadingScene extends Phaser.Scene {
@@ -34,7 +41,41 @@ export default class LoadingScene extends Phaser.Scene {
         `Available Replays: ${match.availableReplays.length}`,
       ]);
 
-      if (match.matchState === "creating") {
+      const selectedReplays: {
+        [userId: string]: Replay;
+      } = {};
+      match.availableReplays.forEach((availableReplay, index) => {
+        const replayText = this.add.text(
+          100 + index * 20,
+          350,
+          index.toString(),
+          {
+            fontSize: "16px",
+            fontStyle: "bold",
+            color: "#999",
+            backgroundColor: "#0e1217",
+            padding: {
+              x: 4,
+              y: 4,
+            },
+          }
+        );
+        replayText.setInteractive();
+        replayText.on("pointerdown", async () => {
+          if (selectedReplays[availableReplay.userId]) {
+            replayText.setColor("#999");
+            delete selectedReplays[availableReplay.userId];
+          } else {
+            replayText.setColor("#fff");
+            selectedReplays[availableReplay.userId] = await getReplay(
+              availableReplay.matchId,
+              availableReplay.userId
+            );
+          }
+        });
+      });
+
+      if (match.matchState !== "finished") {
         const joinText = this.add.text(600, 550, "Join match", {
           fontSize: "26px",
           fontStyle: "bold",
@@ -47,25 +88,16 @@ export default class LoadingScene extends Phaser.Scene {
         });
         joinText.setInteractive();
         joinText.on("pointerdown", async () => {
-          const { replays } = await joinMatch();
+          try {
+            await joinMatch();
+          } catch (error) {
+            // Could fail, if already joined
+          }
           const playingScene = this.scene.get("playing") as PlayingScene;
-          playingScene.replays = replays;
-          playingScene.scene.start();
-        });
-      } else if (match.matchState === "running") {
-        const continueText = this.add.text(560, 550, "Continue match", {
-          fontSize: "26px",
-          fontStyle: "bold",
-          color: "white",
-          backgroundColor: "#0e1217",
-          padding: {
-            x: 4,
-            y: 4,
-          },
-        });
-        continueText.setInteractive();
-        continueText.on("pointerdown", async () => {
-          const playingScene = this.scene.get("playing") as PlayingScene;
+          playingScene.data.set(
+            "replays",
+            JSON.stringify(Object.values(selectedReplays))
+          );
           playingScene.scene.start();
         });
       }

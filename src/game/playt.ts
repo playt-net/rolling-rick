@@ -19,6 +19,18 @@ export async function getMatch() {
   return result as components["schemas"]["MatchResponse"];
 }
 
+export async function getReplay(matchId: string, userId: string) {
+  const response = await fetch(
+    `/api/replay?matchId=${matchId}&userId=${userId}`
+  );
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw result;
+  }
+  return result as Replay;
+}
+
 export async function joinMatch() {
   const response = await fetch(`/api/match`, {
     method: "POST",
@@ -34,14 +46,11 @@ export async function joinMatch() {
   if (!response.ok) {
     throw result;
   }
-  return result as {
-    match: components["schemas"]["MatchResponse"];
-    replays: Replay[];
-  };
+  return result as components["schemas"]["MatchResponse"];
 }
 
-export function updateScore(score: number) {
-  return fetch(`/api/score`, {
+export async function updateScore(score: number) {
+  const response = await fetch(`/api/score`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -51,6 +60,11 @@ export function updateScore(score: number) {
       playerToken,
     }),
   });
+  const result = await response.json();
+  if (!response.ok) {
+    throw result;
+  }
+  return result as unknown;
 }
 
 export function submitScore(score: number, commands: Replay["commands"]) {

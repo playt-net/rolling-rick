@@ -1,7 +1,6 @@
 import { abortMatch, Replay, submitScore, updateScore } from "../playt.js";
 
 export default class PlayingScene extends Phaser.Scene {
-  replays: Replay[] = [];
   // Random parameter which should be same for all players of this match
   bombVelocity = 122;
   myPlayer!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -16,6 +15,8 @@ export default class PlayingScene extends Phaser.Scene {
 
   others: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
   othersCommands: Replay["commands"][] = [];
+
+  startedAt: number = Date.now();
 
   constructor() {
     super("playing");
@@ -143,7 +144,8 @@ export default class PlayingScene extends Phaser.Scene {
       this
     );
 
-    const othersScore = this.replays
+    const replays: Replay[] = JSON.parse(this.data.get("replays") || "[]");
+    const othersScore = replays
       .map((replay) => `${replay.name}: ${replay.score}`)
       .join(" ");
     this.add.text(16, 4, othersScore, {
@@ -151,7 +153,7 @@ export default class PlayingScene extends Phaser.Scene {
       color: "#000",
     });
 
-    this.replays.forEach((replay) => {
+    replays.forEach((replay) => {
       const otherPlayer = this.physics.add.sprite(100, 450, "dude");
       otherPlayer.setBounce(0.2);
       // otherPlayer.setCollideWorldBounds(true);
@@ -160,6 +162,8 @@ export default class PlayingScene extends Phaser.Scene {
       this.others.push(otherPlayer);
       this.othersCommands.push(replay.commands);
     });
+
+    this.startedAt = Date.now();
   }
 
   update() {
@@ -190,15 +194,16 @@ export default class PlayingScene extends Phaser.Scene {
       this.myPlayer.y,
       this.myPlayer.anims.getName(),
     ];
+    const timer = Date.now() - this.startedAt;
     const previous = this.commands.at(-1);
-    if (previous && previous[1].toString() == position.toString()) {
-      this.commands.push([this.time.now, position]);
+    if (!previous || previous[1].toString() !== position.toString()) {
+      this.commands.push([timer, position]);
     }
 
     this.others.forEach((other, index) => {
       const commands = this.othersCommands[index];
       let nextCommand = commands[0];
-      while (nextCommand && nextCommand[0] <= this.time.now) {
+      while (nextCommand && nextCommand[0] <= timer) {
         commands.splice(0, 1);
         nextCommand = commands[0];
       }
@@ -231,8 +236,8 @@ export default class PlayingScene extends Phaser.Scene {
       this.physics.pause();
       player.setTint(0x00ff00);
       player.anims.play("turn");
-
-      this.commands.push([this.time.now, [player.x, player.y, "turn", "win"]]);
+      const timer = Date.now() - this.startedAt;
+      this.commands.push([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
 
       submitScore(this.score, this.commands);
@@ -246,7 +251,8 @@ export default class PlayingScene extends Phaser.Scene {
     player.setTint(0xff0000);
 
     player.anims.play("turn");
-    this.commands.push([this.time.now, [player.x, player.y, "turn", "loss"]]);
+    const timer = Date.now() - this.startedAt;
+    this.commands.push([timer, [player.x, player.y, "turn", "loss"]]);
 
     this.isFinal = true;
     submitScore(this.score, this.commands);

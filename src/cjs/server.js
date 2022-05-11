@@ -21,9 +21,42 @@ app.use(express.static("game"));
 
 const matchByPlayerToken = {};
 
+app.get("/api/match", async (req, res) => {
+  try {
+    const { playerToken } = req.query;
+    if (typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "playerToken is missing",
+      });
+      return;
+    }
+    const { data: match } = await client.getMatchByPlayerToken({ playerToken });
+    res.json(match);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  }
+});
+
 app.post("/api/match", async (req, res) => {
   try {
     const { playerToken } = req.body;
+    if (typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "playerToken is missing",
+      });
+      return;
+    }
 
     const { data: match } = await client.postMatchJoin({ playerToken });
     matchByPlayerToken[playerToken] = match;
@@ -42,7 +75,7 @@ app.post("/api/match", async (req, res) => {
         commands: replay.commands,
       };
     });
-    res.json(replays);
+    res.json({ match, replays });
   } catch (error) {
     console.error(error);
     if (error instanceof ApiError) {
@@ -62,21 +95,27 @@ app.post("/api/match", async (req, res) => {
 app.post("/api/match/abort", async (req, res) => {
   try {
     const { playerToken } = req.body;
+    if (typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "playerToken is missing",
+      });
+      return;
+    }
+
     const match = matchByPlayerToken[playerToken];
     if (!match) {
       res.status(404).json({ message: "Match not found" });
       return;
     }
-    await client.postAbort({
+    const { status, data } = await client.postAbort({
       id: match.id,
       playerToken,
     });
-    res.status(200).json({});
+    res.status(status).json(data);
   } catch (error) {
     console.error(error);
     if (error instanceof ApiError) {
       const { status, statusText } = error;
-
       res.status(status).json({
         message: statusText,
       });
@@ -91,6 +130,12 @@ app.post("/api/match/abort", async (req, res) => {
 app.post("/api/score", async (req, res) => {
   try {
     const { score, commands, playerToken, finalSnapshot } = req.body;
+    if (typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "playerToken is missing",
+      });
+      return;
+    }
 
     const match = matchByPlayerToken[playerToken];
 
@@ -120,7 +165,6 @@ app.post("/api/score", async (req, res) => {
     console.error(error);
     if (error instanceof ApiError) {
       const { status, statusText } = error;
-
       res.status(status).json({
         message: statusText,
       });

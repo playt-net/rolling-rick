@@ -1,4 +1,4 @@
 node_modules
 .env
-game/**.js
-game/**.js.map
+game/**/*.js
+game/**/*.js.map

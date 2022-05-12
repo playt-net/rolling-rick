@@ -8,6 +8,8 @@ import {
 } from "../playt.js";
 import PlayingScene from "./playing.js";
 
+//https://fun-fair.vercel.app/games/626901c66df1e50329141c02/playing?playerToken=19e91f8b-9603-4183-a241-fdba609158cc
+
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
     super("loading");
@@ -40,6 +42,37 @@ export default class LoadingScene extends Phaser.Scene {
         `Participants: ${match.participants.length}`,
         `Available Replays: ${match.availableReplays.length}`,
       ]);
+
+      this.add.text(100, 300, "Select difficulty:", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+
+      let difficulty = "easy";
+      const easy = this.add.text(120, 350, "[*]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      easy.setInteractive();
+      easy.on("pointerdown", () => console.log("easy selected"));
+
+      const normal = this.add.text(220, 350, "[**]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      normal.setInteractive();
+      normal.on("pointerdown", () => console.log("normal selected"));
+
+      const hard = this.add.text(320, 350, "[***]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      hard.setInteractive();
+      hard.on("pointerdown", () => console.log("hard selected"));
 
       const selectedReplays: {
         [userId: string]: Replay;

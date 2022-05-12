@@ -88,4 +88,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd rolling-rick
-            docker-compose pull && docker-compose up -d
+            docker compose pull && docker compose up -d

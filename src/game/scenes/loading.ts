@@ -43,14 +43,14 @@ export default class LoadingScene extends Phaser.Scene {
         `Available Replays: ${match.availableReplays.length}`,
       ]);
 
-      this.add.text(100, 300, "Select difficulty:", {
+      this.add.text(100, 250, "Select difficulty:", {
         fontSize: "28px",
         fontFamily: "Courier",
         color: "white",
       });
 
       let difficulty = "easy";
-      const easy = this.add.text(120, 350, "[*]", {
+      const easy = this.add.text(100, 280, "[*]", {
         fontSize: "28px",
         fontFamily: "Courier",
         color: "#0f0",
@@ -63,7 +63,7 @@ export default class LoadingScene extends Phaser.Scene {
         hard.setColor("#fff");
       });
 
-      const normal = this.add.text(220, 350, "[**]", {
+      const normal = this.add.text(180, 280, "[**]", {
         fontSize: "28px",
         fontFamily: "Courier",
         color: "white",
@@ -76,7 +76,7 @@ export default class LoadingScene extends Phaser.Scene {
         hard.setColor("#fff");
       });
 
-      const hard = this.add.text(320, 350, "[***]", {
+      const hard = this.add.text(280, 280, "[***]", {
         fontSize: "28px",
         fontFamily: "Courier",
         color: "white",

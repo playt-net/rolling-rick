@@ -93,19 +93,32 @@ export default class PlayingScene extends Phaser.Scene {
       child.setBounceY(0.5 + Math.sin(index) / 4);
     });
 
+    const difficulty: "easy" | "normal" | "hard" = JSON.parse(
+      this.data.get("difficulty")
+    );
+
+    console.log(difficulty);
+
+    const bombVelocity = {
+      easy: 20,
+      normal: 300,
+      hard: 800,
+    }[difficulty];
+
     this.bombs = this.physics.add.group();
 
     let bomb1 = this.bombs.create(400, 32, "bomb");
     bomb1.setBounce(1);
     bomb1.setCollideWorldBounds(true);
-    bomb1.setVelocity(this.bombVelocity, 20);
+    bomb1.setVelocity(this.bombVelocity, bombVelocity);
     bomb1.allowGravity = false;
 
     let bomb2 = this.bombs.create(200, 32, "bomb");
     bomb2.setBounce(1);
     bomb2.setCollideWorldBounds(true);
-    bomb2.setVelocity(-this.bombVelocity, 20);
+    bomb2.setVelocity(-this.bombVelocity, bombVelocity);
     bomb2.allowGravity = false;
+    console.log(bomb1.body.velocity, bomb2.body.velocity);
     //  The score
     this.scoreText = this.add.text(16, 16, "score: 0", {
       fontSize: "32px",

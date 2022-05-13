@@ -97,8 +97,6 @@ export default class PlayingScene extends Phaser.Scene {
       this.data.get("difficulty")
     );
 
-    console.log(difficulty);
-
     const bombVelocity = {
       easy: 20,
       normal: 300,
@@ -118,7 +116,7 @@ export default class PlayingScene extends Phaser.Scene {
     bomb2.setCollideWorldBounds(true);
     bomb2.setVelocity(-this.bombVelocity, bombVelocity);
     bomb2.allowGravity = false;
-    console.log(bomb1.body.velocity, bomb2.body.velocity);
+
     //  The score
     this.scoreText = this.add.text(16, 16, "score: 0", {
       fontSize: "32px",

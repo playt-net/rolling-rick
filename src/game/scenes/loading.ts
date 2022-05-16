@@ -8,8 +8,6 @@ import {
 } from "../playt.js";
 import PlayingScene from "./playing.js";
 
-//https://fun-fair.vercel.app/games/626901c66df1e50329141c02/playing?playerToken=19e91f8b-9603-4183-a241-fdba609158cc
-
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
     super("loading");

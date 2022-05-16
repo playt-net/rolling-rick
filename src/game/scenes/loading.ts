@@ -41,6 +41,52 @@ export default class LoadingScene extends Phaser.Scene {
         `Available Replays: ${match.availableReplays.length}`,
       ]);
 
+      this.add.text(100, 250, "Select difficulty:", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+
+      let difficulty = "easy";
+      const easy = this.add.text(100, 280, "[*]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "#0f0",
+      });
+      easy.setInteractive();
+      easy.on("pointerdown", () => {
+        difficulty = "easy";
+        easy.setColor("#00ff00");
+        normal.setColor("#fff");
+        hard.setColor("#fff");
+      });
+
+      const normal = this.add.text(180, 280, "[**]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      normal.setInteractive();
+      normal.on("pointerdown", () => {
+        difficulty = "normal";
+        easy.setColor("#fff");
+        normal.setColor("#00ff00");
+        hard.setColor("#fff");
+      });
+
+      const hard = this.add.text(280, 280, "[***]", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      hard.setInteractive();
+      hard.on("pointerdown", () => {
+        difficulty = "hard";
+        easy.setColor("#fff");
+        normal.setColor("#fff");
+        hard.setColor("#00ff00");
+      });
+
       const selectedReplays: {
         [userId: string]: Replay;
       } = {};
@@ -98,6 +144,7 @@ export default class LoadingScene extends Phaser.Scene {
             "replays",
             JSON.stringify(Object.values(selectedReplays))
           );
+          playingScene.data.set("difficulty", JSON.stringify(difficulty));
           playingScene.scene.start();
         });
       }

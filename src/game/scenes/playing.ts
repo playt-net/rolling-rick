@@ -11,6 +11,9 @@ export default class PlayingScene extends Phaser.Scene {
   score = 0;
   isFinal = false;
   scoreText!: Phaser.GameObjects.Text;
+  replays!: Replay[];
+  otherScores!: number[];
+  otherScoreText!: Phaser.GameObjects.Text;
   commands: Replay["commands"] = [];
 
   others: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -155,16 +158,23 @@ export default class PlayingScene extends Phaser.Scene {
       this
     );
 
-    const replays: Replay[] = JSON.parse(this.data.get("replays") || "[]");
-    const othersScore = replays
-      .map((replay) => `${replay.name}: ${replay.score}`)
+    this.replays = JSON.parse(this.data.get("replays") || "[]");
+    this.otherScores = Array(this.replays.length)
+      .fill(null)
+      .map(() => 0);
+
+    const othersScore = this.replays
+      .map(
+        (replay, index) =>
+          `${replay.name}: ${this.otherScores[index]}/${replay.score}`
+      )
       .join(" ");
-    this.add.text(16, 4, othersScore, {
+    this.otherScoreText = this.add.text(16, 4, othersScore, {
       fontSize: "16px",
       color: "#000",
     });
 
-    replays.forEach((replay) => {
+    this.replays.forEach((replay) => {
       const otherPlayer = this.physics.add.sprite(100, 450, "dude");
       otherPlayer.setBounce(0.2);
       // otherPlayer.setCollideWorldBounds(true);
@@ -218,15 +228,27 @@ export default class PlayingScene extends Phaser.Scene {
         commands.splice(0, 1);
         nextCommand = commands[0];
       }
-      if (nextCommand) {
+      if (!nextCommand) {
         return;
       }
-      const [x, y, animation, finished] = nextCommand[1];
-      other.setX(x);
-      other.setY(y);
-      other.anims.play(animation, true);
-      if (finished) {
-        other.setTint(finished === "win" ? 0x00ff00 : 0xff0000);
+      if (nextCommand[1][0] === "score") {
+        this.otherScores[index] = nextCommand[1][1];
+        const othersScore = this.replays
+          .map(
+            (replay, index) =>
+              `${replay.name}: ${this.otherScores[index]}/${replay.score}`
+          )
+          .join(" ");
+        this.otherScoreText.setText(othersScore);
+      } else {
+        const [x, y, animation, finished] = nextCommand[1];
+        other.setX(x);
+        other.setY(y);
+        other.anims.play(animation, true);
+
+        if (finished) {
+          other.setTint(finished === "win" ? 0x00ff00 : 0xff0000);
+        }
       }
     });
 
@@ -243,16 +265,17 @@ export default class PlayingScene extends Phaser.Scene {
     this.score += 10;
     this.scoreText.setText(`Score: ${this.score}`);
 
+    const timer = Date.now() - this.startedAt;
     if (this.stars.countActive(true) === 0) {
       this.physics.pause();
       player.setTint(0x00ff00);
       player.anims.play("turn");
-      const timer = Date.now() - this.startedAt;
       this.commands.push([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
 
       submitScore(this.score, this.commands);
     } else {
+      this.commands.push([timer, ["score", this.score]]);
       updateScore(this.score);
     }
   }

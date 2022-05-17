@@ -45,6 +45,36 @@ app.get("/api/match", async (req, res) => {
   }
 });
 
+app.get("/api/player", async (req, res) => {
+  try {
+    const { matchId, playerToken } = req.query;
+    if (typeof matchId !== "string" || typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "Invalid payload",
+      });
+      return;
+    }
+    const { data: player } = await client.getPlayer({
+      id: matchId,
+      playerToken,
+    });
+    res.json(player);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof ApiError) {
+      const { status, statusText } = error;
+
+      res.status(status).json({
+        message: statusText,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  }
+});
+
 app.post("/api/match", async (req, res) => {
   try {
     const { playerToken } = req.body;
@@ -147,13 +177,17 @@ app.post("/api/score", async (req, res) => {
     }
 
     const { data: match } = await client.getMatchByPlayerToken({ playerToken });
+    const { data: player } = await client.getPlayer({
+      id: match.id,
+      playerToken,
+    });
 
     if (finalSnapshot) {
       await client.postReplay({
         matchId: match.id,
         playerToken,
         payload: JSON.stringify({
-          name: "BOB",
+          name: player.username,
           score,
           commands: commands,
         }),

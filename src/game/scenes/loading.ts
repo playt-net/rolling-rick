@@ -1,6 +1,6 @@
-import { components } from "@playt/client";
 import {
   getMatch,
+  getPlayer,
   getReplay,
   joinMatch,
   playerToken,
@@ -32,9 +32,10 @@ export default class LoadingScene extends Phaser.Scene {
         return;
       }
       const match = await getMatch();
+      const player = await getPlayer(match.id);
 
       statusText.setText([
-        `Player Token: ✔`,
+        `Player: ${player.username}`,
         `Match ID: ${match.id}`,
         `Match State: ${match.matchState}`,
         `Participants: ${match.participants.length}`,

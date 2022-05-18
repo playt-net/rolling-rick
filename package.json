@@ -1,6 +1,7 @@
 {
   "name": "rolling-rick",
-  "version": "1.0.0",
+  "version": "0.0.2",
+  "private": true,
   "description": "",
   "engines": {
     "node": ">= 16.0.0",

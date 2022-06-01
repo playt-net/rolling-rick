@@ -146,6 +146,7 @@ export default class LoadingScene extends Phaser.Scene {
             JSON.stringify(Object.values(selectedReplays))
           );
           playingScene.data.set("difficulty", JSON.stringify(difficulty));
+          playingScene.data.set("userId", JSON.stringify(player.userId));
           playingScene.scene.start();
         });
       }

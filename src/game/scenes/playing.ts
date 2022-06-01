@@ -1,4 +1,11 @@
-import { abortMatch, Replay, submitScore, updateScore } from "../playt.js";
+import { components } from "@playt/client";
+import {
+  abortMatch,
+  getMatch,
+  Replay,
+  submitScore,
+  updateScore,
+} from "../playt.js";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -14,6 +21,8 @@ export default class PlayingScene extends Phaser.Scene {
   replays!: Replay[];
   otherScores!: number[];
   otherScoreText!: Phaser.GameObjects.Text;
+  liveScores!: { userId: string; username: string; score: string }[];
+  liveScoresText!: Phaser.GameObjects.Text;
   commands: Replay["commands"] = [];
 
   others: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -174,6 +183,11 @@ export default class PlayingScene extends Phaser.Scene {
       color: "#000",
     });
 
+    this.liveScoresText = this.add.text(200, 24, "Live: ", {
+      fontSize: "16px",
+      color: "#000",
+    });
+
     this.replays.forEach((replay) => {
       const otherPlayer = this.physics.add.sprite(100, 450, "dude");
       otherPlayer.setBounce(0.2);
@@ -185,6 +199,7 @@ export default class PlayingScene extends Phaser.Scene {
     });
 
     this.startedAt = Date.now();
+    this.fetchLiveScores();
   }
 
   update() {
@@ -272,7 +287,6 @@ export default class PlayingScene extends Phaser.Scene {
       player.anims.play("turn");
       this.commands.push([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
-
       submitScore(this.score, this.commands);
     } else {
       this.commands.push([timer, ["score", this.score]]);
@@ -290,5 +304,54 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.isFinal = true;
     submitScore(this.score, this.commands);
+  }
+
+  async fetchLiveScores() {
+    const userId = JSON.parse(this.data.get("userId")) as string;
+    setTimeout(async () => {
+      const match: components["schemas"]["MatchResponse"] = await getMatch();
+
+      const scores = match.scoreSnapshots.filter(
+        (score) => score.userId !== userId
+      );
+
+      console.log(scores);
+
+      const uniqueCurrentScores = scores.reduce((acc, score) => {
+        const existingScore = acc.find((s) => s.userId === score.userId);
+        if (existingScore) {
+          if (
+            Math.floor(new Date(existingScore.timestamp).getTime() / 1000) <
+            Math.floor(new Date(score.timestamp).getTime() / 1000)
+          ) {
+            existingScore.score = score.score;
+            existingScore.finalSnapshot = score.finalSnapshot;
+          }
+        } else {
+          acc.push(score);
+        }
+        return acc;
+      }, [] as components["schemas"]["MatchResponse"]["scoreSnapshots"]);
+
+      const runningScores = uniqueCurrentScores.filter(
+        (score) => score.finalSnapshot === false
+      );
+
+      const runningScoresWithNames = runningScores.map((score) => {
+        const user = match.participants.find((u) => u.userId === score.userId);
+        return {
+          ...score,
+          username: user?.username,
+        };
+      });
+
+      this.liveScoresText.setText(
+        runningScoresWithNames
+          .map((score) => `Live: ${score.username}: ${score.score}`)
+          .join(" ")
+      );
+
+      await this.fetchLiveScores();
+    }, 1000);
   }
 }

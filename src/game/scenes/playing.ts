@@ -345,8 +345,6 @@ export default class PlayingScene extends Phaser.Scene {
         };
       });
 
-      console.log(runningScores);
-
       this.liveScoresText.setText(
         runningScoresWithNames
           .map((score) => `Live: ${score.username}: ${score.score}`)

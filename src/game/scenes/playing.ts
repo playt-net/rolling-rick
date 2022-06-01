@@ -337,11 +337,19 @@ export default class PlayingScene extends Phaser.Scene {
         (score) => score.finalSnapshot === false
       );
 
+      const runningScoresWithNames = runningScores.map((score) => {
+        const user = match.participants.find((u) => u.userId === score.userId);
+        return {
+          ...score,
+          username: user?.username,
+        };
+      });
+
       console.log(runningScores);
 
       this.liveScoresText.setText(
-        runningScores
-          .map((score) => `Live: ${score.userId}: ${score.score}`)
+        runningScoresWithNames
+          .map((score) => `Live: ${score.username}: ${score.score}`)
           .join(" ")
       );
 

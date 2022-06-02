@@ -315,8 +315,6 @@ export default class PlayingScene extends Phaser.Scene {
         (score) => score.userId !== userId
       );
 
-      console.log(scores);
-
       const uniqueCurrentScores = scores.reduce((acc, score) => {
         const existingScore = acc.find((s) => s.userId === score.userId);
         if (existingScore) {

@@ -16,19 +16,7 @@ export async function getMatch() {
   if (!response.ok) {
     throw result;
   }
-  return result as components["schemas"]["MatchResponse"];
-}
-
-export async function getPlayer(matchId: string) {
-  const response = await fetch(
-    `/api/player?matchId=${matchId}&playerToken=${playerToken}`
-  );
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw result;
-  }
-  return result as components["schemas"]["PlayerResponse"];
+  return result;
 }
 
 export async function getReplay(matchId: string, userId: string) {

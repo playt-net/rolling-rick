@@ -4,6 +4,7 @@ dotenv.config();
 import "./fetch-polyfill.ts";
 import express from "express";
 import { ApiError, components, PlaytClient } from "@playt/client";
+import { fetcher } from "../lib/fetcher";
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
@@ -27,66 +28,30 @@ app.get("/api/match", async (req, res) => {
       });
       return;
     }
-    const { data: match } = await client.getMatchByPlayerToken({ playerToken });
+
+    const response = await fetcher(
+      `/api/matches/search?playerToken=${playerToken}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playerToken,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      res.status(response.status).json({
+        message: response.statusText,
+      });
+      return;
+    }
+
+    const match = await response.json();
+
     res.json(match);
-  } catch (error) {
-    console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
-  }
-});
-
-app.get("/api/player", async (req, res) => {
-  try {
-    const { matchId, playerToken } = req.query;
-    if (typeof matchId !== "string" || typeof playerToken !== "string") {
-      res.status(400).json({
-        message: "Invalid payload",
-      });
-      return;
-    }
-    const { data: player } = await client.getPlayer({
-      id: matchId,
-      playerToken,
-    });
-    res.json(player);
-  } catch (error) {
-    console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
-  }
-});
-
-app.post("/api/match", async (req, res) => {
-  try {
-    const { playerToken } = req.body;
-    if (typeof playerToken !== "string") {
-      res.status(400).json({
-        message: "playerToken is missing",
-      });
-      return;
-    }
-
-    const { status, data } = await client.postMatchJoin({ playerToken });
-    res.status(status).json(data);
   } catch (error) {
     console.error(error);
     if (error instanceof ApiError) {
@@ -176,30 +141,19 @@ app.post("/api/score", async (req, res) => {
       return;
     }
 
-    const { data: match } = await client.getMatchByPlayerToken({ playerToken });
-    const { data: player } = await client.getPlayer({
-      id: match.id,
-      playerToken,
+    const response = await fetcher("/api/matches/scores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerToken,
+        score,
+        finalSnapshot: finalSnapshot,
+      }),
     });
 
-    if (finalSnapshot) {
-      await client.postReplay({
-        matchId: match.id,
-        playerToken,
-        payload: JSON.stringify({
-          name: player.username,
-          score,
-          commands: commands,
-        }),
-      });
-    }
-    const { status, data } = await client.postScore({
-      id: match.id,
-      playerToken,
-      score,
-      finalSnapshot,
-    });
-    res.status(status).json(data);
+    res.status(response.status).json(response.statusText);
   } catch (error) {
     console.error(error);
     if (error instanceof ApiError) {

@@ -1,6 +1,5 @@
 import {
   getMatch,
-  getPlayer,
   getReplay,
   joinMatch,
   playerToken,
@@ -32,14 +31,13 @@ export default class LoadingScene extends Phaser.Scene {
         return;
       }
       const match = await getMatch();
-      const player = await getPlayer(match.id);
 
       statusText.setText([
-        `Player: ${player.username}`,
-        `Match ID: ${match.id}`,
+        `Player: ${match.player.name}`,
+        `Match ID: ${match._id}`,
         `Match State: ${match.matchState}`,
-        `Participants: ${match.participants.length}`,
-        `Available Replays: ${match.availableReplays.length}`,
+        `Participants: ${match.players.length}`,
+        `Available Replays: ${0}`,
       ]);
 
       this.add.text(100, 250, "Select difficulty:", {
@@ -91,7 +89,7 @@ export default class LoadingScene extends Phaser.Scene {
       const selectedReplays: {
         [userId: string]: Replay;
       } = {};
-      match.availableReplays.forEach((availableReplay, index) => {
+      /* match.availableReplays.forEach((availableReplay, index) => {
         const replayText = this.add.text(
           100 + index * 20,
           350,
@@ -121,7 +119,7 @@ export default class LoadingScene extends Phaser.Scene {
           }
         });
       });
-
+ */
       if (match.matchState !== "finished") {
         const joinText = this.add.text(600, 550, "Join match", {
           fontSize: "26px",
@@ -146,7 +144,7 @@ export default class LoadingScene extends Phaser.Scene {
             JSON.stringify(Object.values(selectedReplays))
           );
           playingScene.data.set("difficulty", JSON.stringify(difficulty));
-          playingScene.data.set("userId", JSON.stringify(player.userId));
+          playingScene.data.set("userId", JSON.stringify(match.player.userId));
           playingScene.scene.start();
         });
       }

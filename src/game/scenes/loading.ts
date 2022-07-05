@@ -1,10 +1,4 @@
-import {
-  getMatch,
-  getReplay,
-  joinMatch,
-  playerToken,
-  Replay,
-} from "../playt.js";
+import { getMatch, getReplay, playerToken, Replay } from "../playt.js";
 import PlayingScene from "./playing.js";
 
 export default class LoadingScene extends Phaser.Scene {
@@ -133,11 +127,6 @@ export default class LoadingScene extends Phaser.Scene {
         });
         joinText.setInteractive();
         joinText.on("pointerdown", async () => {
-          try {
-            await joinMatch();
-          } catch (error) {
-            // Could fail, if already joined
-          }
           const playingScene = this.scene.get("playing") as PlayingScene;
           playingScene.data.set(
             "replays",

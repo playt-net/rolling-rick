@@ -31,24 +31,6 @@ export async function getReplay(matchId: string, userId: string) {
   return result as Replay;
 }
 
-export async function joinMatch() {
-  const response = await fetch(`/api/match`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
-    }),
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw result;
-  }
-  return result as components["schemas"]["MatchResponse"];
-}
-
 export async function updateScore(score: number) {
   const response = await fetch(`/api/score`, {
     method: "POST",

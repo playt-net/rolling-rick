@@ -149,7 +149,7 @@ app.post("/api/score", async (req, res) => {
       body: JSON.stringify({
         playerToken,
         score,
-        finalSnapshot: finalSnapshot,
+        finalSnapshot,
       }),
     });
 

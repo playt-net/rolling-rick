@@ -5,10 +5,10 @@ import "./fetch-polyfill.ts";
 import express from "express";
 import { fetcher } from "./fetcher";
 
-const { API_HOST, API_KEY, PORT = 8080 } = process.env;
+const { API_HOST, PORT = 8080 } = process.env;
 
-if (!API_HOST || !API_KEY) {
-  throw new Error("Missing API_HOST or API_KEY environment variables");
+if (!API_HOST) {
+  throw new Error("Missing API_HOST  environment variables");
 }
 
 const app = express();

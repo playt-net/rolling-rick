@@ -1,4 +1,3 @@
-import { components } from "@playt/client";
 import { getMatch, Replay, submitScore, updateScore } from "../playt.js";
 
 export default class PlayingScene extends Phaser.Scene {
@@ -302,14 +301,14 @@ export default class PlayingScene extends Phaser.Scene {
   async fetchLiveScores() {
     const userId = JSON.parse(this.data.get("userId")) as string;
     setTimeout(async () => {
-      const match: components["schemas"]["MatchResponse"] = await getMatch();
+      const match = await getMatch();
 
       const scores = match.scoreSnapshots.filter(
-        (score) => score.userId !== userId
+        (score: any) => score.userId !== userId
       );
 
-      const uniqueCurrentScores = scores.reduce((acc, score) => {
-        const existingScore = acc.find((s) => s.userId === score.userId);
+      const uniqueCurrentScores = scores.reduce((acc: any, score: any) => {
+        const existingScore = acc.find((s: any) => s.userId === score.userId);
         if (existingScore) {
           if (
             Math.floor(new Date(existingScore.timestamp).getTime() / 1000) <
@@ -322,14 +321,16 @@ export default class PlayingScene extends Phaser.Scene {
           acc.push(score);
         }
         return acc;
-      }, [] as components["schemas"]["MatchResponse"]["scoreSnapshots"]);
+      }, []);
 
       const runningScores = uniqueCurrentScores.filter(
-        (score) => score.finalSnapshot === false
+        (score: any) => score.finalSnapshot === false
       );
 
-      const runningScoresWithNames = runningScores.map((score) => {
-        const user = match.participants.find((u) => u.userId === score.userId);
+      const runningScoresWithNames = runningScores.map((score: any) => {
+        const user = match.participants.find(
+          (u: any) => u.userId === score.userId
+        );
         return {
           ...score,
           username: user?.username,
@@ -338,7 +339,7 @@ export default class PlayingScene extends Phaser.Scene {
 
       this.liveScoresText.setText(
         runningScoresWithNames
-          .map((score) => `Live: ${score.username}: ${score.score}`)
+          .map((score: any) => `Live: ${score.username}: ${score.score}`)
           .join(" ")
       );
 

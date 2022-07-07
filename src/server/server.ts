@@ -3,16 +3,13 @@ dotenv.config();
 
 import "./fetch-polyfill.ts";
 import express from "express";
-import { ApiError, components, PlaytClient } from "@playt/client";
-import { fetcher } from "../lib/fetcher";
+import { fetcher } from "./fetcher";
 
 const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
 if (!API_HOST || !API_KEY) {
   throw new Error("Missing API_HOST or API_KEY environment variables");
 }
-
-const client = new PlaytClient({ apiKey: API_KEY, apiHost: API_HOST });
 
 const app = express();
 
@@ -53,17 +50,9 @@ app.get("/api/match", async (req, res) => {
     res.json(match);
   } catch (error) {
     console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 });
 
@@ -89,17 +78,9 @@ app.get("/api/replay", async (req, res) => {
     res.status(200).json({ name: replay.name, ...payload });
   } catch (error) {
     console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 });
 
@@ -147,16 +128,9 @@ app.post("/api/score", async (req, res) => {
     res.status(response.status).json(response.statusText);
   } catch (error) {
     console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 });
 

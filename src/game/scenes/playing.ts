@@ -1,11 +1,4 @@
-import { components } from "@playt/client";
-import {
-  abortMatch,
-  getMatch,
-  Replay,
-  submitScore,
-  updateScore,
-} from "../playt.js";
+import { getMatch, Replay, submitScore, updateScore } from "../playt.js";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -135,14 +128,14 @@ export default class PlayingScene extends Phaser.Scene {
       color: "#000",
     });
 
-    const abortText = this.add.text(710, 550, "ABORT", {
+    const surrenderText = this.add.text(710, 550, "SURRENDER", {
       fontSize: "26px",
       color: "white",
     });
-    abortText.setInteractive();
-    abortText.on("pointerdown", () => {
+    surrenderText.setInteractive();
+    surrenderText.on("pointerdown", () => {
       this.physics.pause();
-      abortMatch();
+      submitScore(0, this.commands);
     });
 
     //  Collide the player and the stars with the platforms
@@ -171,7 +164,6 @@ export default class PlayingScene extends Phaser.Scene {
     this.otherScores = Array(this.replays.length)
       .fill(null)
       .map(() => 0);
-
     const othersScore = this.replays
       .map(
         (replay, index) =>
@@ -309,43 +301,26 @@ export default class PlayingScene extends Phaser.Scene {
   async fetchLiveScores() {
     const userId = JSON.parse(this.data.get("userId")) as string;
     setTimeout(async () => {
-      const match: components["schemas"]["MatchResponse"] = await getMatch();
+      const match = await getMatch();
 
-      const scores = match.scoreSnapshots.filter(
-        (score) => score.userId !== userId
+      const otherPlayingPlayers = match.players.filter(
+        (player: any) => player.userId !== userId && !player.finalScore
       );
 
-      const uniqueCurrentScores = scores.reduce((acc, score) => {
-        const existingScore = acc.find((s) => s.userId === score.userId);
-        if (existingScore) {
-          if (
-            Math.floor(new Date(existingScore.timestamp).getTime() / 1000) <
-            Math.floor(new Date(score.timestamp).getTime() / 1000)
-          ) {
-            existingScore.score = score.score;
-            existingScore.finalSnapshot = score.finalSnapshot;
-          }
-        } else {
-          acc.push(score);
-        }
-        return acc;
-      }, [] as components["schemas"]["MatchResponse"]["scoreSnapshots"]);
-
-      const runningScores = uniqueCurrentScores.filter(
-        (score) => score.finalSnapshot === false
-      );
-
-      const runningScoresWithNames = runningScores.map((score) => {
-        const user = match.participants.find((u) => u.userId === score.userId);
+      const runningScoresWithNames = otherPlayingPlayers.map((player: any) => {
+        const latestScore = player.scoreSnapshots.at(-1)?.score || 0;
         return {
-          ...score,
-          username: user?.username,
+          score: latestScore,
+          name: player.name,
         };
       });
 
       this.liveScoresText.setText(
         runningScoresWithNames
-          .map((score) => `Live: ${score.username}: ${score.score}`)
+          .map(
+            (playerScore: any) =>
+              `Live: ${playerScore.name}: ${playerScore.score}`
+          )
           .join(" ")
       );
 

@@ -1,10 +1,8 @@
-import type { components } from "@playt/client";
-
 const params = new URLSearchParams(window.location.search);
 
 export type Replay = {
   name: string;
-  score: any;
+  score: number;
   commands: any;
 };
 export const playerToken = params.get("playerToken");
@@ -16,19 +14,7 @@ export async function getMatch() {
   if (!response.ok) {
     throw result;
   }
-  return result as components["schemas"]["MatchResponse"];
-}
-
-export async function getPlayer(matchId: string) {
-  const response = await fetch(
-    `/api/player?matchId=${matchId}&playerToken=${playerToken}`
-  );
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw result;
-  }
-  return result as components["schemas"]["PlayerResponse"];
+  return result;
 }
 
 export async function getReplay(matchId: string, userId: string) {
@@ -41,24 +27,6 @@ export async function getReplay(matchId: string, userId: string) {
     throw result;
   }
   return result as Replay;
-}
-
-export async function joinMatch() {
-  const response = await fetch(`/api/match`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
-    }),
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw result;
-  }
-  return result as components["schemas"]["MatchResponse"];
 }
 
 export async function updateScore(score: number) {
@@ -90,18 +58,6 @@ export function submitScore(score: number, commands: Replay["commands"]) {
       commands,
       playerToken,
       finalSnapshot: true,
-    }),
-  });
-}
-
-export function abortMatch() {
-  return fetch(`/api/match/abort`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
     }),
   });
 }

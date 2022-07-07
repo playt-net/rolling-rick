@@ -303,43 +303,24 @@ export default class PlayingScene extends Phaser.Scene {
     setTimeout(async () => {
       const match = await getMatch();
 
-      const scores = match.scoreSnapshots.filter(
-        (score: any) => score.userId !== userId
+      const otherPlayingPlayers = match.players.filter(
+        (player: any) => player.userId !== userId && !player.finalScore
       );
 
-      const uniqueCurrentScores = scores.reduce((acc: any, score: any) => {
-        const existingScore = acc.find((s: any) => s.userId === score.userId);
-        if (existingScore) {
-          if (
-            Math.floor(new Date(existingScore.timestamp).getTime() / 1000) <
-            Math.floor(new Date(score.timestamp).getTime() / 1000)
-          ) {
-            existingScore.score = score.score;
-            existingScore.finalSnapshot = score.finalSnapshot;
-          }
-        } else {
-          acc.push(score);
-        }
-        return acc;
-      }, []);
-
-      const runningScores = uniqueCurrentScores.filter(
-        (score: any) => score.finalSnapshot === false
-      );
-
-      const runningScoresWithNames = runningScores.map((score: any) => {
-        const user = match.participants.find(
-          (u: any) => u.userId === score.userId
-        );
+      const runningScoresWithNames = otherPlayingPlayers.map((player: any) => {
+        const latestScore = player.scoreSnapshots.at(-1)?.score || 0;
         return {
-          ...score,
-          username: user?.username,
+          score: latestScore,
+          name: player.name,
         };
       });
 
       this.liveScoresText.setText(
         runningScoresWithNames
-          .map((score: any) => `Live: ${score.username}: ${score.score}`)
+          .map(
+            (playerScore: any) =>
+              `Live: ${playerScore.name}: ${playerScore.score}`
+          )
           .join(" ")
       );
 

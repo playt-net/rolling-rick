@@ -103,37 +103,6 @@ app.get("/api/replay", async (req, res) => {
   }
 });
 
-app.post("/api/match/abort", async (req, res) => {
-  try {
-    const { playerToken } = req.body;
-    if (typeof playerToken !== "string") {
-      res.status(400).json({
-        message: "playerToken is missing",
-      });
-      return;
-    }
-
-    const { data: match } = await client.getMatchByPlayerToken({ playerToken });
-    const { status, data } = await client.postAbort({
-      id: match.id,
-      playerToken,
-    });
-    res.status(status).json(data);
-  } catch (error) {
-    console.error(error);
-    if (error instanceof ApiError) {
-      const { status, statusText } = error;
-      res.status(status).json({
-        message: statusText,
-      });
-    } else {
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
-    }
-  }
-});
-
 app.post("/api/score", async (req, res) => {
   try {
     const { score, commands, playerToken, finalSnapshot } = req.body;

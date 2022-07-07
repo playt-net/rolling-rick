@@ -61,15 +61,3 @@ export function submitScore(score: number, commands: Replay["commands"]) {
     }),
   });
 }
-
-export function abortMatch() {
-  return fetch(`/api/match/abort`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
-    }),
-  });
-}

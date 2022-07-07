@@ -50,7 +50,6 @@ app.get("/api/match", async (req, res) => {
     }
 
     const match = await response.json();
-
     res.json(match);
   } catch (error) {
     console.error(error);
@@ -78,12 +77,16 @@ app.get("/api/replay", async (req, res) => {
       return;
     }
 
-    const { status, data } = await client.getReplay({
-      matchId: matchId,
-      userId: userId,
-    });
-    const replay = JSON.parse(data.payload);
-    res.status(status).json(replay);
+    const response = await fetcher(
+      `/api/replays?matchId=${matchId}&userId=${userId}`
+    );
+    if (!response.ok) {
+      res.status(response.status).json(response.statusText);
+      return;
+    }
+    const replay = await response.json();
+    const payload = JSON.parse(replay.payload);
+    res.status(200).json({ name: replay.name, ...payload });
   } catch (error) {
     console.error(error);
     if (error instanceof ApiError) {
@@ -139,6 +142,25 @@ app.post("/api/score", async (req, res) => {
         message: "playerToken is missing",
       });
       return;
+    }
+    if (finalSnapshot) {
+      const response = await fetcher("/api/replays", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playerToken,
+          payload: JSON.stringify({
+            score,
+            commands: commands,
+          }),
+        }),
+      });
+      if (!response.ok) {
+        res.status(response.status).json(response.statusText);
+        return;
+      }
     }
 
     const response = await fetcher("/api/matches/scores", {

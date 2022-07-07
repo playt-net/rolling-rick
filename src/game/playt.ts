@@ -1,10 +1,8 @@
-import type { components } from "@playt/client";
-
 const params = new URLSearchParams(window.location.search);
 
 export type Replay = {
   name: string;
-  score: any;
+  score: number;
   commands: any;
 };
 export const playerToken = params.get("playerToken");

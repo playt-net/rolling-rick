@@ -171,7 +171,6 @@ export default class PlayingScene extends Phaser.Scene {
     this.otherScores = Array(this.replays.length)
       .fill(null)
       .map(() => 0);
-
     const othersScore = this.replays
       .map(
         (replay, index) =>

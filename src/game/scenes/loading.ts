@@ -25,13 +25,15 @@ export default class LoadingScene extends Phaser.Scene {
         return;
       }
       const match = await getMatch();
-
+      const playersWithReplays = match.players.filter(
+        (player: any) => player.replayId
+      );
       statusText.setText([
         `Player: ${match.player.name}`,
-        `Match ID: ${match._id}`,
+        `Match ID: ${match.id}`,
         `Match State: ${match.matchState}`,
         `Participants: ${match.players.length}`,
-        `Available Replays: ${0}`,
+        `Available Replays: ${playersWithReplays.length}`,
       ]);
 
       this.add.text(100, 250, "Select difficulty:", {
@@ -83,7 +85,7 @@ export default class LoadingScene extends Phaser.Scene {
       const selectedReplays: {
         [userId: string]: Replay;
       } = {};
-      /* match.availableReplays.forEach((availableReplay, index) => {
+      playersWithReplays.forEach((player: any, index: number) => {
         const replayText = this.add.text(
           100 + index * 20,
           350,
@@ -101,19 +103,19 @@ export default class LoadingScene extends Phaser.Scene {
         );
         replayText.setInteractive();
         replayText.on("pointerdown", async () => {
-          if (selectedReplays[availableReplay.userId]) {
+          if (selectedReplays[player.userId]) {
             replayText.setColor("#999");
-            delete selectedReplays[availableReplay.userId];
+            delete selectedReplays[player.userId];
           } else {
             replayText.setColor("#fff");
-            selectedReplays[availableReplay.userId] = await getReplay(
-              availableReplay.matchId,
-              availableReplay.userId
+            selectedReplays[player.userId] = await getReplay(
+              match.id,
+              player.userId
             );
           }
         });
       });
- */
+
       if (match.matchState !== "finished") {
         const joinText = this.add.text(600, 550, "Join match", {
           fontSize: "26px",

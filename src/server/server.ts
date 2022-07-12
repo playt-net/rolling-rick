@@ -1,14 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import "./fetch-polyfill.ts";
 import express from "express";
-import { fetcher } from "./fetcher";
+import { fetcher } from "./fetcher.js";
 
 const { API_HOST, PORT = 8080 } = process.env;
 
 if (!API_HOST) {
-  throw new Error("Missing API_HOST  environment variables");
+  throw new Error("Missing API_HOST environment variables");
 }
 
 const app = express();

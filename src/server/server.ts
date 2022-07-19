@@ -4,13 +4,13 @@ dotenv.config();
 
 import express from "express";
 
-const { API_HOST, PORT = 8080 } = process.env;
+const { API_HOST, API_KEY, PORT = 8080 } = process.env;
 
-if (!API_HOST) {
-  throw new Error("Missing API_HOST environment variables");
+if (!API_HOST || !API_KEY) {
+  throw new Error("Missing environment variables");
 }
 
-const client = PlaytClient(API_HOST);
+const client = PlaytClient(API_HOST, API_KEY);
 const app = express();
 
 app.use(express.json());

@@ -1,8 +1,8 @@
+import PlaytClient from "@playt/client";
 import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import { fetcher } from "./fetcher.js";
 
 const { API_HOST, PORT = 8080 } = process.env;
 
@@ -10,6 +10,7 @@ if (!API_HOST) {
   throw new Error("Missing API_HOST environment variables");
 }
 
+const client = PlaytClient(API_HOST);
 const app = express();
 
 app.use(express.json());
@@ -25,27 +26,18 @@ app.get("/api/match", async (req, res) => {
       return;
     }
 
-    const response = await fetcher(
-      `/api/matches/search?playerToken=${playerToken}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          playerToken,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      res.status(response.status).json({
-        message: response.statusText,
+    const {
+      data: match,
+      ok,
+      status,
+      statusText,
+    } = await client.searchMatch({ playerToken });
+    if (!ok) {
+      res.status(status).json({
+        message: statusText,
       });
       return;
     }
-
-    const match = await response.json();
     res.json(match);
   } catch (error) {
     console.error(error);
@@ -65,14 +57,16 @@ app.get("/api/replay", async (req, res) => {
       return;
     }
 
-    const response = await fetcher(
-      `/api/replays?matchId=${matchId}&userId=${userId}`
-    );
-    if (!response.ok) {
-      res.status(response.status).json(response.statusText);
+    const {
+      data: replay,
+      ok,
+      status,
+      statusText,
+    } = await client.getReplay({ matchId, userId });
+    if (!ok) {
+      res.status(status).json(statusText);
       return;
     }
-    const replay = await response.json();
     const payload = JSON.parse(replay.payload);
     res.status(200).json({ name: replay.name, ...payload });
   } catch (error) {
@@ -93,38 +87,25 @@ app.post("/api/score", async (req, res) => {
       return;
     }
     if (finalSnapshot) {
-      const response = await fetcher("/api/replays", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          playerToken,
-          payload: JSON.stringify({
-            score,
-            commands: commands,
-          }),
+      const { ok, status, statusText } = await client.submitReplay({
+        playerToken,
+        payload: JSON.stringify({
+          score,
+          commands: commands,
         }),
       });
-      if (!response.ok) {
-        res.status(response.status).json(response.statusText);
+      if (!ok) {
+        res.status(status).json(statusText);
         return;
       }
     }
-
-    const response = await fetcher("/api/matches/scores", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        playerToken,
-        score,
-        finalSnapshot,
-      }),
+    const { status, statusText } = await client.submitScore({
+      playerToken,
+      score,
+      finalSnapshot,
     });
 
-    res.status(response.status).json(response.statusText);
+    res.status(status).json(statusText);
   } catch (error) {
     console.error(error);
     res.status(500).json({

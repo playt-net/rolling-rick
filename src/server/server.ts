@@ -10,7 +10,7 @@ if (!API_HOST || !API_KEY) {
   throw new Error("Missing environment variables");
 }
 
-const client = PlaytClient(API_HOST, API_KEY);
+const client = PlaytClient(API_KEY, API_HOST);
 const app = express();
 
 app.use(express.json());

@@ -79,7 +79,7 @@ app.get("/api/replay", async (req, res) => {
 
 app.post("/api/score", async (req, res) => {
   try {
-    const { score, commands, playerToken, finalSnapshot } = req.body;
+    const { score, commands, playerToken, finalSnapshot, surrender } = req.body;
     if (typeof playerToken !== "string") {
       res.status(400).json({
         message: "playerToken is missing",
@@ -103,6 +103,7 @@ app.post("/api/score", async (req, res) => {
       playerToken,
       score,
       finalSnapshot,
+      surrender,
     });
 
     res.status(status).json(statusText);

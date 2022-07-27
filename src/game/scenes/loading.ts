@@ -1,5 +1,6 @@
 import { getMatch, getReplay, playerToken, Replay } from "../playt.js";
 import PlayingScene from "./playing.js";
+import TutorialScene from "./tutorial.js";
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -130,14 +131,21 @@ export default class LoadingScene extends Phaser.Scene {
         });
         joinText.setInteractive();
         joinText.on("pointerdown", async () => {
-          const playingScene = this.scene.get("playing") as PlayingScene;
-          playingScene.data.set(
-            "replays",
-            JSON.stringify(Object.values(selectedReplays))
-          );
-          playingScene.data.set("difficulty", JSON.stringify(difficulty));
-          playingScene.data.set("userId", JSON.stringify(match.player.userId));
-          playingScene.scene.start();
+          if (match.matchTier === "tutorial") {
+            this.scene.start("tutorial");
+          } else {
+            const playingScene = this.scene.get("playing") as PlayingScene;
+            playingScene.data.set(
+              "replays",
+              JSON.stringify(Object.values(selectedReplays))
+            );
+            playingScene.data.set("difficulty", JSON.stringify(difficulty));
+            playingScene.data.set(
+              "userId",
+              JSON.stringify(match.player.userId)
+            );
+            this.scene.start("playing");
+          }
         });
       }
     } catch (error: any) {

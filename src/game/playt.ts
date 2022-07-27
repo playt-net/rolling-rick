@@ -75,3 +75,17 @@ export function surrender(score: number) {
     }),
   });
 }
+
+export function endTutorial() {
+  return fetch(`http://localhost:4000/api/tutorials/scores`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      playerToken,
+      score: 0,
+      finalSnapshot: true,
+    }),
+  });
+}

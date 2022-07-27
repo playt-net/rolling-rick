@@ -1,5 +1,6 @@
 import LoadingScene from "./scenes/loading.js";
 import PlayingScene from "./scenes/playing.js";
+import TutorialScene from "./scenes/tutorial.js";
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -17,5 +18,5 @@ new Phaser.Game({
       debug: false,
     },
   },
-  scene: [LoadingScene, PlayingScene],
+  scene: [LoadingScene, PlayingScene, TutorialScene],
 });

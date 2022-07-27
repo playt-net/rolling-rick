@@ -31,6 +31,7 @@ export default class LoadingScene extends Phaser.Scene {
       statusText.setText([
         `Player: ${match.player.name}`,
         `Match ID: ${match.id}`,
+        `Match Tier: ${match.matchTier}`,
         `Match State: ${match.matchState}`,
         `Participants: ${match.players.length}`,
         `Available Replays: ${playersWithReplays.length}`,

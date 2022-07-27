@@ -61,3 +61,17 @@ export function submitScore(score: number, commands: Replay["commands"]) {
     }),
   });
 }
+
+export function surrender(score: number) {
+  return fetch(`/api/score`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      playerToken,
+      score,
+      surrender: true,
+    }),
+  });
+}

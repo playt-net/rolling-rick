@@ -1,4 +1,10 @@
-import { getMatch, Replay, submitScore, updateScore } from "../playt.js";
+import {
+  getMatch,
+  Replay,
+  submitScore,
+  surrender,
+  updateScore,
+} from "../playt.js";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -128,14 +134,14 @@ export default class PlayingScene extends Phaser.Scene {
       color: "#000",
     });
 
-    const surrenderText = this.add.text(710, 550, "SURRENDER", {
+    const surrenderText = this.add.text(640, 550, "SURRENDER", {
       fontSize: "26px",
       color: "white",
     });
     surrenderText.setInteractive();
     surrenderText.on("pointerdown", () => {
       this.physics.pause();
-      submitScore(0, this.commands);
+      surrender(this.score);
     });
 
     //  Collide the player and the stars with the platforms

@@ -2,9 +2,8 @@
   "compilerOptions": {
     "types": ["phaser"],
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "rootDir": "./src",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "outDir": "./dist",
     "strict": true,
     "noEmit": true,

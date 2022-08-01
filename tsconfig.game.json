@@ -1,14 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "module": "es6",
+    "target": "es6",
     "moduleResolution": "Node",
     "outDir": "./game",
-    "rootDir": "./src/game",
+    "allowJs": true,
     "noEmit": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": ["dom", "esnext", "scripthost"]
   },
-  "include": ["src/game"],
   "exclude": []
 }

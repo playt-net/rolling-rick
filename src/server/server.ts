@@ -10,7 +10,10 @@ if (!API_HOST || !API_KEY) {
   throw new Error("Missing environment variables");
 }
 
-const client = PlaytClient(API_KEY, API_HOST);
+const client = PlaytClient({
+  apiKey: API_KEY,
+  apiUrl: API_HOST,
+});
 const app = express();
 
 app.use(express.json());
@@ -68,7 +71,7 @@ app.get("/api/replay", async (req, res) => {
       return;
     }
     const payload = JSON.parse(replay.payload);
-    res.status(200).json({ name: replay.name, ...payload });
+    res.status(200).json({ userId, name: replay.name, ...payload });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -116,5 +119,5 @@ app.post("/api/score", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on http://localhost:${PORT}`);
+  console.log(`Rolling Rick listening on http://localhost:${PORT}`);
 });

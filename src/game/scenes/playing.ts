@@ -1,10 +1,12 @@
 import {
-  getMatch,
+  playerToken,
   Replay,
   submitScore,
   surrender,
   updateScore,
-} from "../playt.js";
+} from "../playt";
+import PlaytClient from "@playt/client";
+import throttle from "lodash.throttle";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -23,17 +25,21 @@ export default class PlayingScene extends Phaser.Scene {
   liveScores!: { userId: string; username: string; score: string }[];
   liveScoresText!: Phaser.GameObjects.Text;
   commands: Replay["commands"] = [];
+  lastUpdate = Date.now();
 
   others: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
   othersCommands: Replay["commands"][] = [];
 
   startedAt: number = Date.now();
+  liveMatch: {
+    send: (payload: any) => void;
+  } | null = null;
 
   constructor() {
     super("playing");
   }
 
-  preload() {
+  async preload() {
     this.load.image("sky", "assets/sky.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/star.png");
@@ -42,9 +48,19 @@ export default class PlayingScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
+
+    const client = PlaytClient({ apiUrl: process.env.API_HOST });
+
+    this.liveMatch = await client.subscribeLiveMatch(
+      playerToken!,
+      (data: any) => {
+        const index = this.replays.findIndex((replay) => replay.userId);
+        this.othersCommands[index].push(data.command);
+      }
+    );
   }
 
-  async create() {
+  create() {
     //  A simple background for our game
     this.add.image(400, 300, "sky");
 
@@ -189,7 +205,6 @@ export default class PlayingScene extends Phaser.Scene {
     this.replays.forEach((replay) => {
       const otherPlayer = this.physics.add.sprite(100, 450, "dude");
       otherPlayer.setBounce(0.2);
-      // otherPlayer.setCollideWorldBounds(true);
       this.physics.add.collider(otherPlayer, this.platforms);
 
       this.others.push(otherPlayer);
@@ -197,7 +212,6 @@ export default class PlayingScene extends Phaser.Scene {
     });
 
     this.startedAt = Date.now();
-    this.fetchLiveScores();
   }
 
   update() {
@@ -231,7 +245,7 @@ export default class PlayingScene extends Phaser.Scene {
     const timer = Date.now() - this.startedAt;
     const previous = this.commands.at(-1);
     if (!previous || previous[1].toString() !== position.toString()) {
-      this.commands.push([timer, position]);
+      this.addCommand([timer, position]);
     }
 
     this.others.forEach((other, index) => {
@@ -283,14 +297,30 @@ export default class PlayingScene extends Phaser.Scene {
       this.physics.pause();
       player.setTint(0x00ff00);
       player.anims.play("turn");
-      this.commands.push([timer, [player.x, player.y, "turn", "win"]]);
+      this.addCommand([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
       submitScore(this.score, this.commands);
     } else {
-      this.commands.push([timer, ["score", this.score]]);
+      this.addCommand([timer, ["score", this.score]]);
       updateScore(this.score);
     }
   }
+
+  addCommand(command: any) {
+    this.commands.push(command);
+    this.sendLiveMatchUpdate(command);
+  }
+
+  sendLiveMatchUpdate = throttle(
+    (command: any) => {
+      if (this.liveMatch) {
+        const userId = this.data.get("userId");
+        this.liveMatch.send({ userId, command });
+      }
+    },
+    100,
+    { leading: true, trailing: true }
+  );
 
   hitBomb(player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
     this.physics.pause();
@@ -298,39 +328,9 @@ export default class PlayingScene extends Phaser.Scene {
 
     player.anims.play("turn");
     const timer = Date.now() - this.startedAt;
-    this.commands.push([timer, [player.x, player.y, "turn", "loss"]]);
+    this.addCommand([timer, [player.x, player.y, "turn", "loss"]]);
 
     this.isFinal = true;
     submitScore(this.score, this.commands);
-  }
-
-  async fetchLiveScores() {
-    const userId = JSON.parse(this.data.get("userId")) as string;
-    setTimeout(async () => {
-      const match = await getMatch();
-
-      const otherPlayingPlayers = match.players.filter(
-        (player: any) => player.userId !== userId && !player.finalScore
-      );
-
-      const runningScoresWithNames = otherPlayingPlayers.map((player: any) => {
-        const latestScore = player.scoreSnapshots.at(-1)?.score || 0;
-        return {
-          score: latestScore,
-          name: player.name,
-        };
-      });
-
-      this.liveScoresText.setText(
-        runningScoresWithNames
-          .map(
-            (playerScore: any) =>
-              `Live: ${playerScore.name}: ${playerScore.score}`
-          )
-          .join(" ")
-      );
-
-      await this.fetchLiveScores();
-    }, 1000);
   }
 }

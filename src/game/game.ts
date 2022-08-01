@@ -1,6 +1,6 @@
-import LoadingScene from "./scenes/loading.js";
-import PlayingScene from "./scenes/playing.js";
-import TutorialScene from "./scenes/tutorial.js";
+import LoadingScene from "./scenes/loading";
+import PlayingScene from "./scenes/playing";
+import TutorialScene from "./scenes/tutorial";
 
 new Phaser.Game({
   type: Phaser.AUTO,

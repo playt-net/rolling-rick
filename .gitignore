@@ -1,5 +1,6 @@
 node_modules
 .env
 game/**/*.js
+game/**/*.js.LICENSE.txt
 game/**/*.js.map
 dist

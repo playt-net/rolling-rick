@@ -1,4 +1,4 @@
-import { endTutorial } from "../playt.js";
+import { endTutorial } from "../playt";
 
 export default class TutorialScene extends Phaser.Scene {
   constructor() {

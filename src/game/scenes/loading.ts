@@ -1,6 +1,5 @@
-import { getMatch, getReplay, playerToken, Replay } from "../playt.js";
-import PlayingScene from "./playing.js";
-import TutorialScene from "./tutorial.js";
+import { getMatch, getReplay, playerToken, Replay } from "../playt";
+import PlayingScene from "./playing";
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -26,16 +25,16 @@ export default class LoadingScene extends Phaser.Scene {
         return;
       }
       const match = await getMatch();
-      const playersWithReplays = match.players.filter(
-        (player: any) => player.replayId
-      );
+
       statusText.setText([
         `Player: ${match.player.name}`,
         `Match ID: ${match.id}`,
         `Match Tier: ${match.matchTier}`,
         `Match State: ${match.matchState}`,
         `Participants: ${match.players.length}`,
-        `Available Replays: ${playersWithReplays.length}`,
+        `Available Replays: ${
+          match.players.filter((player) => player.replayId).length
+        }`,
       ]);
 
       this.add.text(100, 250, "Select difficulty:", {
@@ -87,35 +86,41 @@ export default class LoadingScene extends Phaser.Scene {
       const selectedReplays: {
         [userId: string]: Replay;
       } = {};
-      playersWithReplays.forEach((player: any, index: number) => {
-        const replayText = this.add.text(
-          100 + index * 20,
-          350,
-          index.toString(),
+      match.players.forEach(async (player, index) => {
+        if (player.userId === match.player.userId) {
+          return;
+        }
+        if (player.replayId) {
+          selectedReplays[player.userId] = await getReplay(
+            match.id,
+            player.userId
+          );
+          selectedReplays[player.userId].name += " (Replay)";
+        } else {
+          selectedReplays[player.userId] = {
+            userId: player.userId,
+            name: player.name,
+            score: 0,
+            commands: [],
+          };
+          selectedReplays[player.userId].name += " (Live)";
+        }
+
+        this.add.text(
+          100,
+          350 + index * 30,
+          selectedReplays[player.userId].name,
           {
             fontSize: "16px",
             fontStyle: "bold",
-            color: "#999",
-            backgroundColor: "#0e1217",
+            color: "#fff",
+            backgroundColor: "#031217",
             padding: {
               x: 4,
               y: 4,
             },
           }
         );
-        replayText.setInteractive();
-        replayText.on("pointerdown", async () => {
-          if (selectedReplays[player.userId]) {
-            replayText.setColor("#999");
-            delete selectedReplays[player.userId];
-          } else {
-            replayText.setColor("#fff");
-            selectedReplays[player.userId] = await getReplay(
-              match.id,
-              player.userId
-            );
-          }
-        });
       });
 
       if (match.matchState !== "finished") {
@@ -148,10 +153,10 @@ export default class LoadingScene extends Phaser.Scene {
           }
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       statusText.setText([
         "You destroyed the internet!",
-        error.message || "Unknown error",
+        error instanceof Error ? error.message : "Unknown error",
       ]);
     }
   }

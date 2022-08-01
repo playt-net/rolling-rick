@@ -1,6 +1,9 @@
+import { paths } from "@playt/client/dist/types";
+
 const params = new URLSearchParams(window.location.search);
 
 export type Replay = {
+  userId: string;
   name: string;
   score: number;
   commands: any;
@@ -14,7 +17,7 @@ export async function getMatch() {
   if (!response.ok) {
     throw result;
   }
-  return result;
+  return result as paths["/api/matches/search"]["post"]["responses"]["200"]["content"]["application/json"];
 }
 
 export async function getReplay(matchId: string, userId: string) {
@@ -77,7 +80,7 @@ export function surrender(score: number) {
 }
 
 export function endTutorial() {
-  return fetch(`http://localhost:4000/api/tutorials/scores`, {
+  return fetch(`${process.env.API_HOST}/api/tutorials/scores`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

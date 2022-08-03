@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import "./fetch-polyfill.js";
+
 import PlaytClient from "@playt/client";
 import express from "express";
 

@@ -9,7 +9,7 @@
     "npm": ">= 8.0.0"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.game.json && tsc --project tsconfig.server.json",
+    "build": "webpack -c webpack.config.cjs --mode production && tsc --project tsconfig.server.json",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:game\"",
     "dev:game": "webpack -c webpack.config.cjs --watch --mode development",
     "dev:server": "tsc-watch --project tsconfig.server.json --onSuccess \"node dist/server.js\"",

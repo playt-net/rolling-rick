@@ -25,7 +25,7 @@ module.exports = {
   },
   output: {
     filename: "game.js",
-    path: path.resolve(__dirname, "game"),
+    path: path.resolve(__dirname, "public"),
   },
   plugins: [
     new webpack.DefinePlugin({

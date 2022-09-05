@@ -9,7 +9,7 @@
     "npm": ">= 8.0.0"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.game.json && tsc --project tsconfig.server.json",
+    "build": "webpack -c webpack.config.cjs --mode production && tsc --project tsconfig.server.json",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:game\"",
     "dev:game": "webpack -c webpack.config.cjs --watch --mode development",
     "dev:server": "tsc-watch --project tsconfig.server.json --onSuccess \"node dist/server.js\"",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/playt-net/rolling-rick#readme",
   "dependencies": {
-    "@playt/client": "3.7.0",
+    "@playt/client": "4.1.0",
     "dotenv": "16.0.1",
     "express": "4.18.1",
     "lodash.throttle": "4.1.1",

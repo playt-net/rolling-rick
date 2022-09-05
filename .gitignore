@@ -1,7 +1,6 @@
 node_modules
 .env
-game/**/*.js
-game/**/*.js.LICENSE.txt
-game/**/*.js.map
+public/game.js
+public/game.js.LICENSE.txt
 dist
 .vercel

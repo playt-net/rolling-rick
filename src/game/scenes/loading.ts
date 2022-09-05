@@ -136,7 +136,7 @@ export default class LoadingScene extends Phaser.Scene {
         });
         joinText.setInteractive();
         joinText.on("pointerdown", async () => {
-          if (match.matchTier === "tutorial") {
+          if (match.matchTier.type === "tutorial") {
             this.scene.start("tutorial");
           } else {
             const playingScene = this.scene.get("playing") as PlayingScene;

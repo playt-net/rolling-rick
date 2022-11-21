@@ -1,6 +1,6 @@
 import { quitMatch } from "../playt";
 
-export default class LoadingScene extends Phaser.Scene {
+export default class EndScene extends Phaser.Scene {
   constructor() {
     super("end");
   }

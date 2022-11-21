@@ -111,31 +111,31 @@ app.post("/api/score", async (req, res) => {
       surrender,
     });
 
-    app.post("/api/quit", async (req, res) => {
-      try {
-        const { playerToken } = req.body;
+    res.status(status).json(statusText);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
 
-        if (typeof playerToken !== "string") {
-          res.status(400).json({
-            message: "playerToken is missing",
-          });
-          return;
-        }
+app.post("/api/quit", async (req, res) => {
+  try {
+    const { playerToken } = req.body;
 
-        const message = await client.quitMatch({
-          playerToken,
-        });
+    if (typeof playerToken !== "string") {
+      res.status(400).json({
+        message: "playerToken is missing",
+      });
+      return;
+    }
 
-        res.status(message.status).json(message.status);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({
-          message: "Internal Server Error",
-        });
-      }
+    const message = await client.quitMatch({
+      playerToken,
     });
 
-    res.status(status).json(statusText);
+    res.status(message.status).json(message.status);
   } catch (error) {
     console.error(error);
     res.status(500).json({

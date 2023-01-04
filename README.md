@@ -1,6 +1,10 @@
 # Rolling Rick
 
-This documentation is not yet completed.
+## Requirements
+
+### Environment variables
+
+Copy the `template.env` file to `.env` and add an API_KEY according to the FunFair platform instructions.
 
 ## Build game
 

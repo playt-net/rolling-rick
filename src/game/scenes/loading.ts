@@ -149,6 +149,12 @@ export default class LoadingScene extends Phaser.Scene {
               "userId",
               JSON.stringify(match.player.userId)
             );
+            // @ts-expect-error
+            AnybrainSetUserId(match.player.userId);
+            // @ts-expect-error
+            AnybrainStartSDK();
+            // @ts-expect-error
+            AnybrainStartMatch(match.id);
             this.scene.start("playing");
           }
         });

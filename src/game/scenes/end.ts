@@ -23,6 +23,10 @@ export default class EndScene extends Phaser.Scene {
     endText.on("pointerdown", () => {
       try {
         quitMatch();
+        // @ts-expect-error
+        AnybrainStopMatch();
+        // @ts-expect-error
+        AnybrainStopSDK();
       } catch (error) {
         endText.setText([
           "You destroyed the internet!",

@@ -5,7 +5,7 @@ import {
   surrender,
   updateScore,
 } from "../playt";
-import PlaytClient from "@playt/client";
+import PlaytClient, { PlaytServer } from "@playt/client";
 import throttle from "lodash.throttle";
 
 export default class PlayingScene extends Phaser.Scene {
@@ -49,7 +49,7 @@ export default class PlayingScene extends Phaser.Scene {
       frameHeight: 48,
     });
 
-    const client = PlaytClient({ apiUrl: process.env.API_HOST });
+    const client = PlaytServer({ apiUrl: process.env.API_HOST });
 
     this.liveMatch = await client.subscribeLiveMatch(
       playerToken!,

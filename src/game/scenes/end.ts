@@ -1,3 +1,4 @@
+import { client } from "../game";
 import { quitMatch } from "../playt";
 
 export default class EndScene extends Phaser.Scene {
@@ -20,13 +21,10 @@ export default class EndScene extends Phaser.Scene {
 
     endText.setInteractive();
 
-    endText.on("pointerdown", () => {
+    endText.on("pointerdown", async () => {
       try {
-        quitMatch();
-        // @ts-expect-error
-        AnybrainStopMatch();
-        // @ts-expect-error
-        AnybrainStopSDK();
+        await client.stopMatch();
+        await quitMatch();
       } catch (error) {
         endText.setText([
           "You destroyed the internet!",

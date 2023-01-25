@@ -2,6 +2,7 @@ import LoadingScene from "./scenes/loading";
 import PlayingScene from "./scenes/playing";
 import TutorialScene from "./scenes/tutorial";
 import EndScene from "./scenes/end";
+import { PlaytClient } from "@playt/client";
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -22,23 +23,8 @@ new Phaser.Game({
   scene: [LoadingScene, PlayingScene, TutorialScene, EndScene],
 });
 
-async function setupAnybrain() {
-  return new Promise<void>((resolve, reject) => {
-    document.addEventListener("anybrain", (event) => {
-      // @ts-expect-error
-      if (event.detail.loadModuleSuccess()) {
-        // @ts-expect-error
-        // Add secret here
-        AnybrainSetCredentials();
-
-        resolve();
-      }
-      // @ts-expect-error
-      if (event.detail.error != 0) {
-        reject();
-      }
-    });
-  });
-}
-
-setupAnybrain();
+export const client = PlaytClient({
+  apiUrl: "http://localhost:4000",
+  gameId: "",
+  gameKey: "",
+});

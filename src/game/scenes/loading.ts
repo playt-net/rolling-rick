@@ -1,3 +1,4 @@
+import { client } from "../game";
 import { getMatch, getReplay, playerToken, Replay } from "../playt";
 import PlayingScene from "./playing";
 
@@ -149,12 +150,7 @@ export default class LoadingScene extends Phaser.Scene {
               "userId",
               JSON.stringify(match.player.userId)
             );
-            // @ts-expect-error
-            AnybrainSetUserId(match.player.userId);
-            // @ts-expect-error
-            AnybrainStartSDK();
-            // @ts-expect-error
-            AnybrainStartMatch(match.id);
+            await client.startMatch("wumpus");
             this.scene.start("playing");
           }
         });

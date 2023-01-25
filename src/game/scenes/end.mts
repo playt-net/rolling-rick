@@ -1,5 +1,5 @@
-import { client } from "../game";
-import { quitMatch } from "../playt";
+import { client } from "../game.mjs";
+import { quitMatch } from "../playt.mjs";
 
 export default class EndScene extends Phaser.Scene {
   constructor() {

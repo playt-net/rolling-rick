@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import "./fetch-polyfill.js";
+import "./fetch-polyfill.mjs";
 
-import { PlaytServer } from "@playt/client";
+import PlaytClient from "@playt/client";
 import express from "express";
 
 const { API_HOST, API_KEY } = process.env;
@@ -12,7 +12,7 @@ if (!API_HOST || !API_KEY) {
   throw new Error("Missing environment variables");
 }
 
-const client = PlaytServer({
+const client = PlaytClient({
   apiKey: API_KEY,
   apiUrl: API_HOST,
 });

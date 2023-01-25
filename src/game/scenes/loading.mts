@@ -1,6 +1,6 @@
-import { client } from "../game";
-import { getMatch, getReplay, playerToken, Replay } from "../playt";
-import PlayingScene from "./playing";
+import { client } from "../game.mjs";
+import { getMatch, getReplay, playerToken, Replay } from "../playt.mjs";
+import PlayingScene from "./playing.mjs";
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {

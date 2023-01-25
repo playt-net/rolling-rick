@@ -1,8 +1,8 @@
-import LoadingScene from "./scenes/loading";
-import PlayingScene from "./scenes/playing";
-import TutorialScene from "./scenes/tutorial";
-import EndScene from "./scenes/end";
-import { PlaytClient } from "@playt/client";
+import LoadingScene from "./scenes/loading.mjs";
+import PlayingScene from "./scenes/playing.mjs";
+import TutorialScene from "./scenes/tutorial.mjs";
+import EndScene from "./scenes/end.mjs";
+import PlaytBrowserClient from "@playt/client/browser";
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -23,8 +23,7 @@ new Phaser.Game({
   scene: [LoadingScene, PlayingScene, TutorialScene, EndScene],
 });
 
-export const client = PlaytClient({
-  apiUrl: "http://localhost:4000",
+export const client = PlaytBrowserClient({
   gameId: "",
   gameKey: "",
 });

@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
     "types": ["phaser"],
-    "target": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
+
+    "target": "ESNext",
     "outDir": "./dist",
+
     "strict": true,
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/node_modules/*"]

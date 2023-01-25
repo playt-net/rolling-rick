@@ -3,25 +3,21 @@ const path = require("path");
 const webpack = require("webpack");
 
 module.exports = {
-  entry: "./src/game/game.ts",
+  mode: "production",
+  entry: "./src/game/game.mts",
   module: {
     rules: [
       {
-        test: /\.[jt]sx?$/,
-        use: [
-          {
-            loader: "ts-loader",
-            options: {
-              configFile: "tsconfig.game.json",
-            },
-          },
-        ],
-        exclude: /node_modules/,
+        test: /\.mts$/,
+        use: "babel-loader",
       },
     ],
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: [".mts", ".mjs", ".ts", ".js"],
+    extensionAlias: {
+      ".mjs": [".mts", ".mjs"],
+    },
   },
   output: {
     filename: "game.js",

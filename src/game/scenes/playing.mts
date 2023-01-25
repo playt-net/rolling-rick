@@ -4,9 +4,9 @@ import {
   submitScore,
   surrender,
   updateScore,
-} from "../playt";
-import PlaytClient, { PlaytServer } from "@playt/client";
+} from "../playt.mjs";
 import throttle from "lodash.throttle";
+import { client } from "../game.mjs";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -49,8 +49,7 @@ export default class PlayingScene extends Phaser.Scene {
       frameHeight: 48,
     });
 
-    const client = PlaytServer({ apiUrl: process.env.API_HOST });
-
+    // @ts-expect-error TODO
     this.liveMatch = await client.subscribeLiveMatch(
       playerToken!,
       (data: any) => {

@@ -1,4 +1,4 @@
-import { paths } from "@playt/client/dist/types";
+import { paths } from "@playt/client";
 
 const params = new URLSearchParams(window.location.search);
 

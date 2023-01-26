@@ -1,6 +1,5 @@
 node_modules
 .env
-public/game.js
-public/game.js.LICENSE.txt
-dist
+/public/bundles
+/dist
 .vercel

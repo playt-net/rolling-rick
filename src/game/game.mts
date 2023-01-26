@@ -24,7 +24,7 @@ new Phaser.Game({
 });
 
 export const client = PlaytBrowserClient({
-  apiUrl: ""
+  apiUrl: "",
   gameId: "",
   gameKey: "",
 });

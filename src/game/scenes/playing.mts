@@ -49,7 +49,6 @@ export default class PlayingScene extends Phaser.Scene {
       frameHeight: 48,
     });
 
-    // @ts-expect-error TODO
     this.liveMatch = await client.subscribeLiveMatch(
       playerToken!,
       (data: any) => {

@@ -15,32 +15,33 @@
     "type": "git",
     "url": "git+https://github.com/playt-net/rolling-rick.git"
   },
-  "author": "",
+  "author": "PLAYT.net AG",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/playt-net/rolling-rick/issues"
   },
   "homepage": "https://github.com/playt-net/rolling-rick#readme",
   "dependencies": {
-    "@playt/client": "4.2.1",
-    "dotenv": "16.0.1",
-    "express": "4.18.1",
-    "lodash.throttle": "4.1.1",
-    "node-fetch": "3.2.6",
-    "phaser": "3.55.2"
+    "@playt/client": "^4.2.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "lodash.throttle": "^4.1.1",
+    "node-fetch": "^3.2.6",
+    "phaser": "^3.55.2"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "7.18.6",
-    "@types/express": "4.17.13",
-    "@types/lodash.throttle": "4.1.7",
-    "@types/node-fetch": "2.6.2",
-    "babel-loader": "9.1.2",
-    "concurrently": "7.2.2",
-    "rimraf": "4.1.2",
-    "ts-node": "10.9.1",
-    "tsc-watch": "5.0.3",
-    "typescript": "4.9.4",
-    "webpack": "5.75.0",
-    "webpack-cli": "4.10.0"
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/express": "^4.17.13",
+    "@types/lodash.throttle": "^4.1.7",
+    "@types/node-fetch": "^2.6.2",
+    "babel-loader": "^9.1.2",
+    "concurrently": "^7.2.2",
+    "rimraf": "^4.1.2",
+    "ts-node": "^10.9.1",
+    "ts-loader": "^9.3.1",
+    "tsc-watch": "^5.0.3",
+    "typescript": "~4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^4.10.0"
   }
 }

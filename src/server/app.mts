@@ -9,6 +9,7 @@ import express from "express";
 const { API_HOST, API_KEY } = process.env;
 
 if (!API_HOST || !API_KEY) {
+  console.error({ API_HOST, API_KEY });
   throw new Error("Missing environment variables");
 }
 

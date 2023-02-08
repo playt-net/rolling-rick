@@ -1,7 +1,16 @@
 import { join } from "path";
-import { DefinePlugin, type Configuration } from "webpack";
+import {
+  EnvironmentPlugin,
+  DefinePlugin,
+  ProvidePlugin,
+  type Configuration,
+} from "webpack";
 import dotenv from "dotenv";
-dotenv.config();
+
+const { parsed: dotenvVars } = dotenv.config();
+if (dotenvVars == null) {
+  throw new Error("Not .env vars present");
+}
 
 const config: Configuration = {
   mode: "production",
@@ -35,7 +44,11 @@ const config: Configuration = {
   },
   plugins: [
     new DefinePlugin({
-      "process.env.API_HOST": JSON.stringify(process.env.API_HOST),
+      "process.env": JSON.stringify(
+        Object.fromEntries(
+          Object.entries(dotenvVars).map(([key, value]) => [key, value])
+        )
+      ),
     }),
   ],
   experiments: {

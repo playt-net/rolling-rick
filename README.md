@@ -6,6 +6,8 @@
 
 Copy the `template.env` file to `.env` and add an API_KEY according to the FunFair platform instructions.
 
+TODO anybrain credentials
+
 ## Build game
 
 The game is built with TypeScript and Phaser. To build the game, run the following command:

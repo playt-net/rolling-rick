@@ -1,8 +1,9 @@
+import PlaytBrowserClient from "@playt/client/browser";
+
 import LoadingScene from "./scenes/loading.mjs";
 import PlayingScene from "./scenes/playing.mjs";
 import TutorialScene from "./scenes/tutorial.mjs";
 import EndScene from "./scenes/end.mjs";
-import PlaytBrowserClient from "@playt/client/browser";
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -23,8 +24,15 @@ new Phaser.Game({
   scene: [LoadingScene, PlayingScene, TutorialScene, EndScene],
 });
 
+const { API_HOST, ANYBRAIN_GAME_KEY, ANYBRAIN_GAME_SECRET } = process.env;
+
+if (!API_HOST || !ANYBRAIN_GAME_KEY || !ANYBRAIN_GAME_SECRET) {
+  console.error({ API_HOST, ANYBRAIN_GAME_KEY, ANYBRAIN_GAME_SECRET });
+  throw new Error("Missing environment variables");
+}
+
 export const client = PlaytBrowserClient({
-  apiUrl: "",
-  gameId: "",
-  gameKey: "",
+  apiUrl: API_HOST,
+  anybrainGameKey: ANYBRAIN_GAME_KEY,
+  anybrainGameSecret: ANYBRAIN_GAME_SECRET,
 });

@@ -6,7 +6,7 @@
 
 Copy the `template.env` file to `.env` and add an API_KEY according to the FunFair platform instructions.
 
-TODO anybrain credentials
+TODO document anybrain credentials
 
 ## Build game
 

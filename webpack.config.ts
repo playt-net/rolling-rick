@@ -21,18 +21,9 @@ const config: Configuration = {
         test: /\.mts$/,
         use: "babel-loader",
       },
-      {
-        test: /\.wasm$/,
-        type: "asset/inline",
-      },
     ],
   },
   resolve: {
-    fallback: {
-      crypto: false,
-      fs: false,
-      path: false,
-    },
     extensions: [".mts", ".mjs", ".ts", ".js"],
     extensionAlias: {
       ".mjs": [".mts", ".mjs"],
@@ -51,9 +42,6 @@ const config: Configuration = {
       ),
     }),
   ],
-  experiments: {
-    asyncWebAssembly: true,
-  },
 };
 
 export default config;

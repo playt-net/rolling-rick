@@ -298,6 +298,7 @@ export default class PlayingScene extends Phaser.Scene {
       this.addCommand([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
       submitScore(this.score, this.commands);
+      client.stopMatch();
       this.scene.start("end");
     } else {
       this.addCommand([timer, ["score", this.score]]);
@@ -331,6 +332,7 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.isFinal = true;
     submitScore(this.score, this.commands);
+    client.stopMatch();
     this.scene.start("end");
   }
 }

@@ -1,4 +1,3 @@
-import { client } from "../game.mjs";
 import { quitMatch } from "../playt.mjs";
 
 export default class EndScene extends Phaser.Scene {
@@ -23,7 +22,6 @@ export default class EndScene extends Phaser.Scene {
 
     endText.on("pointerdown", async () => {
       try {
-        await client.stopMatch();
         await quitMatch();
       } catch (error) {
         endText.setText([

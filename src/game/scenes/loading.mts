@@ -27,8 +27,14 @@ export default class LoadingScene extends Phaser.Scene {
       }
       const match = await getMatch();
 
+      const { player } = match;
+      if (!player) {
+        statusText.setText([`Player Token: -`, `Participants: ?`]);
+        return;
+      }
+
       statusText.setText([
-        `Player: ${match.player.name}`,
+        `Player: ${player.name}`,
         `Match ID: ${match.id}`,
         `Match Tier: ${match.matchTier.name}`,
         `Match State: ${match.matchState}`,
@@ -88,7 +94,7 @@ export default class LoadingScene extends Phaser.Scene {
         [userId: string]: Replay;
       } = {};
       match.players.forEach(async (player, index) => {
-        if (player.userId === match.player.userId) {
+        if (player.userId === player.userId) {
           return;
         }
         if (player.replayId) {
@@ -146,11 +152,8 @@ export default class LoadingScene extends Phaser.Scene {
               JSON.stringify(Object.values(selectedReplays))
             );
             playingScene.data.set("difficulty", JSON.stringify(difficulty));
-            playingScene.data.set(
-              "userId",
-              JSON.stringify(match.player.userId)
-            );
-            await client.startMatch(match.player.userId, match.id, playerToken);
+            playingScene.data.set("userId", JSON.stringify(player.userId));
+            await client.startMatch(player.userId, match.id, playerToken);
             this.scene.start("playing");
           }
         });

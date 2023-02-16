@@ -1,10 +1,5 @@
 import { join } from "path";
-import {
-  EnvironmentPlugin,
-  DefinePlugin,
-  ProvidePlugin,
-  type Configuration,
-} from "webpack";
+import { DefinePlugin, type Configuration } from "webpack";
 import dotenv from "dotenv";
 
 const { parsed: dotenvVars } = dotenv.config();

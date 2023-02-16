@@ -150,7 +150,7 @@ export default class LoadingScene extends Phaser.Scene {
               "userId",
               JSON.stringify(match.player.userId)
             );
-            await client.startMatch("wumpus");
+            await client.startMatch(match.player.userId, match.id, "wumpus");
             this.scene.start("playing");
           }
         });

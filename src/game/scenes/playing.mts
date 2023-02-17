@@ -4,9 +4,9 @@ import {
   submitScore,
   surrender,
   updateScore,
-} from "../playt";
-import PlaytClient from "@playt/client";
+} from "../playt.mjs";
 import throttle from "lodash.throttle";
+import { client } from "../game.mjs";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match
@@ -48,8 +48,6 @@ export default class PlayingScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
-
-    const client = PlaytClient({ apiUrl: process.env.API_HOST });
 
     this.liveMatch = await client.subscribeLiveMatch(
       playerToken!,
@@ -300,6 +298,7 @@ export default class PlayingScene extends Phaser.Scene {
       this.addCommand([timer, [player.x, player.y, "turn", "win"]]);
       this.isFinal = true;
       submitScore(this.score, this.commands);
+      client.stopMatch();
       this.scene.start("end");
     } else {
       this.addCommand([timer, ["score", this.score]]);
@@ -333,6 +332,7 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.isFinal = true;
     submitScore(this.score, this.commands);
+    client.stopMatch();
     this.scene.start("end");
   }
 }

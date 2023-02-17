@@ -1,4 +1,4 @@
-import { paths } from "@playt/client/dist/types";
+import { paths } from "@playt/client";
 
 const params = new URLSearchParams(window.location.search);
 
@@ -8,7 +8,11 @@ export type Replay = {
   score: number;
   commands: any;
 };
-export const playerToken = params.get("playerToken");
+const playerTokenQueryParam = params.get("playerToken");
+if (!playerTokenQueryParam) {
+  throw new Error("playerToken query param is required");
+}
+export const playerToken = playerTokenQueryParam;
 
 export async function getMatch() {
   const response = await fetch(`/api/match?playerToken=${playerToken}`);

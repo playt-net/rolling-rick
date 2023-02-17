@@ -3,8 +3,18 @@ import { DefinePlugin, type Configuration } from "webpack";
 import dotenv from "dotenv";
 
 const { parsed: dotenvVars } = dotenv.config();
-if (dotenvVars == null) {
-  throw new Error("Not .env vars present");
+
+const plugins = [];
+if (dotenvVars) {
+  plugins.push(
+    new DefinePlugin({
+      "process.env": JSON.stringify(
+        Object.fromEntries(
+          Object.entries(dotenvVars).map(([key, value]) => [key, value])
+        )
+      ),
+    })
+  );
 }
 
 const config: Configuration = {
@@ -28,15 +38,7 @@ const config: Configuration = {
     filename: "game.js",
     path: join(__dirname, "public", "bundles"),
   },
-  plugins: [
-    new DefinePlugin({
-      "process.env": JSON.stringify(
-        Object.fromEntries(
-          Object.entries(dotenvVars).map(([key, value]) => [key, value])
-        )
-      ),
-    }),
-  ],
+  plugins,
 };
 
 export default config;

@@ -2,20 +2,18 @@ import { join } from "path";
 import { DefinePlugin, type Configuration } from "webpack";
 import dotenv from "dotenv";
 
-const { parsed: dotenvVars } = dotenv.config();
+dotenv.config();
 
 const plugins = [];
-if (dotenvVars) {
-  plugins.push(
-    new DefinePlugin({
-      "process.env": JSON.stringify(
-        Object.fromEntries(
-          Object.entries(dotenvVars).map(([key, value]) => [key, value])
-        )
-      ),
-    })
-  );
-}
+plugins.push(
+  new DefinePlugin({
+    "process.env": JSON.stringify(
+      Object.fromEntries(
+        Object.entries(process.env).map(([key, value]) => [key, value])
+      )
+    ),
+  })
+);
 
 const config: Configuration = {
   mode: "production",

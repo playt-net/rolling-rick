@@ -4,17 +4,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { PORT, API_HOST, API_KEY } = process.env;
-console.debug("env:", { PORT, API_HOST, API_KEY });
+const { API_HOST } = process.env;
+console.debug("env:", { API_HOST });
 
-const plugins = [];
-plugins.push(
-  new EnvironmentPlugin({
-    PORT: 3001,
-    API_HOST: undefined,
-    API_KEY: undefined,
-  })
-);
+const plugins = [new EnvironmentPlugin(["API_HOST"])];
 
 const config: Configuration = {
   mode: "production",

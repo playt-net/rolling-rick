@@ -6,7 +6,8 @@ import "./fetch-polyfill.mjs";
 import PlaytClient from "@playt/client";
 import express from "express";
 
-const { API_HOST, API_KEY } = process.env;
+const API_HOST = process.env.API_HOST;
+const API_KEY = process.env.API_KEY;
 
 if (!API_HOST || !API_KEY) {
   console.error({ API_HOST, API_KEY });

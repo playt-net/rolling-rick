@@ -1,17 +1,18 @@
 import { join } from "path";
-import { DefinePlugin, type Configuration } from "webpack";
+import { EnvironmentPlugin, type Configuration } from "webpack";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const { PORT, API_HOST, API_KEY } = process.env;
+console.debug("env:", { PORT, API_HOST, API_KEY });
+
 const plugins = [];
 plugins.push(
-  new DefinePlugin({
-    "process.env": JSON.stringify(
-      Object.fromEntries(
-        Object.entries(process.env).map(([key, value]) => [key, value])
-      )
-    ),
+  new EnvironmentPlugin({
+    PORT: 3001,
+    API_HOST: undefined,
+    API_KEY: undefined,
   })
 );
 

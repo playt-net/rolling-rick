@@ -24,7 +24,7 @@ new Phaser.Game({
   scene: [LoadingScene, PlayingScene, TutorialScene, EndScene],
 });
 
-const { API_HOST } = process.env;
+const API_HOST = process.env.API_HOST;
 
 if (!API_HOST) {
   console.error({ API_HOST });

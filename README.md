@@ -5,7 +5,7 @@
 ### Environment variables
 
 All necessary environment variables values can be found in PLAYT's Bitwarden vault.
-Create a `.env.local` file in the repo root with the contents of the Bitwarden entry.
+Create a `.env` file in the repo root with the contents of the Bitwarden entry.
 Then add an API_KEY according to the FunFair platform instructions.
 
 ## Build game

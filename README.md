@@ -4,22 +4,14 @@
 
 ### Environment variables
 
-All necessary environment variables values can be found in PLAYT's Bitwarden vault.
-Create a `.env` file in the repo root with the contents of the Bitwarden entry.
-Then add an API_KEY according to the FunFair platform instructions.
+Copy `.env.example` to `.env` and set the `API_KEY` accordingly for the game you'd like to play.
 
 ## Build game
 
-The game is built with TypeScript and Phaser. To build the game, run the following command:
+The game is built with TypeScript and Phaser. To build and run the game, run the following command:
 
-```
-npm run build
-```
-
-or run in watch mode with:
-
-```
-npm run dev
+```sh
+npm run build && npm run start
 ```
 
 The source files are under the `src/game` directory. The game JavaScript files are built in the `game` directory (like `game.js`).

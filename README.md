@@ -1,5 +1,8 @@
 # Rolling Rick
 
+webpack4 branch:
+Experimental branch to check if building a game incl. the client works with webpack4 too. Install deps. Run the `build` script and `ts-node --transpile-only src/server/server.mts`
+
 ## Requirements
 
 ### Environment variables

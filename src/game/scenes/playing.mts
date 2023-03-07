@@ -4,9 +4,9 @@ import {
   submitScore,
   surrender,
   updateScore,
-} from "../playt.mjs";
+} from "../playt.mts";
 import throttle from "lodash.throttle";
-import { client } from "../game.mjs";
+import { client } from "../game.mts";
 
 export default class PlayingScene extends Phaser.Scene {
   // Random parameter which should be same for all players of this match

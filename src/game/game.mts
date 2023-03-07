@@ -1,9 +1,9 @@
-import PlaytBrowserClient from "@playt/client/browser";
+import PlaytBrowserClient from "@playt/client/dist/browser.mjs";
 
-import LoadingScene from "./scenes/loading.mjs";
-import PlayingScene from "./scenes/playing.mjs";
-import TutorialScene from "./scenes/tutorial.mjs";
-import EndScene from "./scenes/end.mjs";
+import LoadingScene from "./scenes/loading.mts";
+import PlayingScene from "./scenes/playing.mts";
+import TutorialScene from "./scenes/tutorial.mts";
+import EndScene from "./scenes/end.mts";
 
 new Phaser.Game({
   type: Phaser.AUTO,

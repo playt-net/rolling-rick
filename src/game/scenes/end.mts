@@ -1,4 +1,4 @@
-import { quitMatch } from "../playt.mjs";
+import { quitMatch } from "../playt.mts";
 
 export default class EndScene extends Phaser.Scene {
   constructor() {

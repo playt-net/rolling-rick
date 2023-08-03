@@ -37,7 +37,7 @@ export default class LoadingScene extends Phaser.Scene {
         `Player: ${player.name}`,
         `Match ID: ${match.id}`,
         `Match Tier: ${match.matchTier.name}`,
-        `Match State: ${match.matchState}`,
+        `Match Status: ${match.status}`,
         `Participants: ${match.players.length}`,
         `Available Replays: ${
           match.players.filter((player) => player.replayId).length
@@ -130,7 +130,7 @@ export default class LoadingScene extends Phaser.Scene {
         );
       });
 
-      if (match.matchState !== "finished") {
+      if (match.status !== "finished") {
         const joinText = this.add.text(600, 550, "Join match", {
           fontSize: "26px",
           fontStyle: "bold",

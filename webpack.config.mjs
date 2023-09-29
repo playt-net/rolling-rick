@@ -1,5 +1,6 @@
-import { join } from "path";
-import { EnvironmentPlugin, type Configuration } from "webpack";
+// @ts-check
+import { fileURLToPath } from "url";
+import webpack from "webpack";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -7,9 +8,10 @@ dotenv.config();
 const { API_HOST } = process.env;
 console.debug("env:", { API_HOST });
 
-const plugins = [new EnvironmentPlugin(["API_HOST"])];
+const plugins = [new webpack.EnvironmentPlugin(["API_HOST"])];
 
-const config: Configuration = {
+/** @type import('webpack').Configuration */
+const config = {
   mode: "production",
   entry: "./src/game/game.mts",
   module: {
@@ -28,7 +30,7 @@ const config: Configuration = {
   },
   output: {
     filename: "game.js",
-    path: join(__dirname, "public", "bundles"),
+    path: fileURLToPath(new URL("public/bundles", import.meta.url)),
   },
   plugins,
 };

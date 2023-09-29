@@ -1,3 +1,3 @@
-import app from "../dist/server/app.mjs";
+import app from "../dist/src/server/app.mjs";
 
 export default app;

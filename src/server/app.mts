@@ -3,8 +3,7 @@ dotenv.config();
 
 import "./fetch-polyfill.mjs";
 
-// @ts-expect-error
-import PlaytClient from "../../../node_modules/@playt/client/dist/index.mjs";
+import PlaytClient from "@playt/client";
 import express from "express";
 
 const API_HOST = process.env.API_HOST;

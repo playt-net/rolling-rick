@@ -48,14 +48,6 @@ export default class PlayingScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
-
-    this.liveMatch = await client.subscribeLiveMatch(
-      playerToken!,
-      (data: any) => {
-        const index = this.replays.findIndex((replay) => replay.userId);
-        this.othersCommands[index].push(data.command);
-      }
-    );
   }
 
   create() {

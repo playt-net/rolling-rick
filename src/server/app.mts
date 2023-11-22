@@ -75,7 +75,7 @@ app.get("/api/replay", async (req, res) => {
       return;
     }
     const payload = JSON.parse(replay.payload);
-    res.status(200).json({ userId, name: replay.name, ...payload });
+    res.status(200).json({ userId, ...payload });
   } catch (error) {
     console.error(error);
     res.status(500).json({

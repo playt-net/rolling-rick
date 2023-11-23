@@ -54,7 +54,7 @@ export async function updateScore(score: number) {
   return result as unknown;
 }
 
-export function submitScore(score: number, commands: Replay["commands"]) {
+export function submitScore(score: number, commands?: Replay["commands"]) {
   return fetch(`/api/score`, {
     method: "POST",
     headers: {
@@ -96,15 +96,5 @@ export function surrender(score: number) {
 }
 
 export function endTutorial() {
-  return fetch(`${process.env.API_HOST}/api/tutorials/scores`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
-      score: 0,
-      finalSnapshot: true,
-    }),
-  });
+  return submitScore(0);
 }

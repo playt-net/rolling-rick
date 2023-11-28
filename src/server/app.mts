@@ -8,16 +8,20 @@ import express from "express";
 
 const API_HOST = process.env.API_HOST;
 const API_KEY = process.env.API_KEY;
-
 if (!API_HOST || !API_KEY) {
   console.error({ API_HOST, API_KEY });
   throw new Error("Missing environment variables");
 }
-
 const client = PlaytClient({
   apiKey: API_KEY,
   apiUrl: API_HOST,
 });
+
+if (!process.env.npm_package_version) {
+  throw new Error("Missing game version");
+}
+void client.initialize({ gameVersion: process.env.npm_package_version });
+
 const app = express();
 
 app.use(express.json());

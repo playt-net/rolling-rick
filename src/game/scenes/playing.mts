@@ -1,10 +1,4 @@
-import {
-  playerToken,
-  Replay,
-  submitScore,
-  surrender,
-  updateScore,
-} from "../playt.mjs";
+import { Replay, submitScore, surrender, updateScore } from "../playt.mjs";
 import throttle from "lodash.throttle";
 import { client } from "../game.mjs";
 
@@ -111,7 +105,7 @@ export default class PlayingScene extends Phaser.Scene {
     });
 
     const difficulty: "easy" | "normal" | "hard" = JSON.parse(
-      this.data.get("difficulty")
+      this.data.get("difficulty"),
     );
 
     const bombVelocity = {
@@ -161,7 +155,7 @@ export default class PlayingScene extends Phaser.Scene {
       this.stars,
       this.collectStar as ArcadePhysicsCallback,
       undefined,
-      this
+      this,
     );
 
     this.physics.add.collider(
@@ -169,7 +163,7 @@ export default class PlayingScene extends Phaser.Scene {
       this.bombs,
       this.hitBomb as unknown as ArcadePhysicsCallback,
       undefined,
-      this
+      this,
     );
 
     this.replays = JSON.parse(this.data.get("replays") || "[]");
@@ -179,7 +173,7 @@ export default class PlayingScene extends Phaser.Scene {
     const othersScore = this.replays
       .map(
         (replay, index) =>
-          `${replay.name}: ${this.otherScores[index]}/${replay.score}`
+          `${replay.name}: ${this.otherScores[index]}/${replay.score}`,
       )
       .join(" ");
     this.otherScoreText = this.add.text(16, 4, othersScore, {
@@ -253,7 +247,7 @@ export default class PlayingScene extends Phaser.Scene {
         const othersScore = this.replays
           .map(
             (replay, index) =>
-              `${replay.name}: ${this.otherScores[index]}/${replay.score}`
+              `${replay.name}: ${this.otherScores[index]}/${replay.score}`,
           )
           .join(" ");
         this.otherScoreText.setText(othersScore);
@@ -274,7 +268,7 @@ export default class PlayingScene extends Phaser.Scene {
 
   collectStar(
     player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-    star: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+    star: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
   ) {
     star.disableBody(true, true);
 
@@ -311,7 +305,7 @@ export default class PlayingScene extends Phaser.Scene {
       }
     },
     100,
-    { leading: true, trailing: true }
+    { leading: true, trailing: true },
   );
 
   hitBomb(player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {

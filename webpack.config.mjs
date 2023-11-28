@@ -5,10 +5,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { API_HOST } = process.env;
-console.debug("env:", { API_HOST });
+const { API_HOST, npm_package_version } = process.env;
+console.debug("env:", { API_HOST, npm_package_version });
 
-const plugins = [new webpack.EnvironmentPlugin(["API_HOST"])];
+const plugins = [
+  new webpack.EnvironmentPlugin(["API_HOST", "npm_package_version"]),
+];
 
 /** @type import('webpack').Configuration */
 const config = {

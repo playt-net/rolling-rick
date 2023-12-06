@@ -9,7 +9,7 @@
     "moduleResolution": "NodeNext",
 
     "target": "ESNext",
-    "outDir": "./dist",
+    "noEmit": true,
 
     "strict": true,
     "noFallthroughCasesInSwitch": true

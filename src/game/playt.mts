@@ -26,7 +26,7 @@ export async function getMatch() {
 
 export async function getReplay(matchId: string, userId: string) {
   const response = await fetch(
-    `/api/replay?matchId=${matchId}&userId=${userId}`
+    `/api/replay?matchId=${matchId}&userId=${userId}`,
   );
 
   const result = await response.json();

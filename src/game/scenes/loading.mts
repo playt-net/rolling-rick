@@ -100,7 +100,7 @@ export default class LoadingScene extends Phaser.Scene {
         if (player.replayId) {
           selectedReplays[player.userId] = await getReplay(
             match.id,
-            player.userId
+            player.userId,
           );
           selectedReplays[player.userId].name += " (Replay)";
         } else {
@@ -126,7 +126,7 @@ export default class LoadingScene extends Phaser.Scene {
               x: 4,
               y: 4,
             },
-          }
+          },
         );
       });
 
@@ -149,7 +149,7 @@ export default class LoadingScene extends Phaser.Scene {
             const playingScene = this.scene.get("playing") as PlayingScene;
             playingScene.data.set(
               "replays",
-              JSON.stringify(Object.values(selectedReplays))
+              JSON.stringify(Object.values(selectedReplays)),
             );
             playingScene.data.set("difficulty", JSON.stringify(difficulty));
             playingScene.data.set("userId", JSON.stringify(player.userId));

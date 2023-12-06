@@ -25,12 +25,22 @@ new Phaser.Game({
 });
 
 const API_HOST = process.env.API_HOST;
-
 if (!API_HOST) {
   console.error({ API_HOST });
   throw new Error("Missing environment variables");
 }
 
+const params = new URLSearchParams(window.location.search);
+const gameId = params.get("gameId");
+if (!gameId) {
+  throw new Error("Missing gameId query param");
+}
 export const client = PlaytBrowserClient({
+  gameId,
   apiUrl: API_HOST,
 });
+
+if (!process.env.npm_package_version) {
+  throw new Error("Missing game version");
+}
+void client.initialize({ gameVersion: process.env.npm_package_version });

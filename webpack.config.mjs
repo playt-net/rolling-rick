@@ -9,7 +9,7 @@ const { API_HOST, npm_package_version } = process.env;
 console.debug("env:", { API_HOST, npm_package_version });
 
 const plugins = [
-  new webpack.EnvironmentPlugin(["API_HOST", "npm_package_version"]),
+  new webpack.EnvironmentPlugin(["API_HOST"]),
 ];
 
 /** @type import('webpack').Configuration */

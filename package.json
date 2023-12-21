@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "rimraf './dist'",
     "build": "npm run clean && tsc && babel src -d dist --extensions .mts --out-file-extension .mjs && webpack",
-    "start": "node dist/server/server.mjs"
+    "start": "node -r dotenv/config dist/server/server.mjs"
   },
   "type": "module",
   "repository": {

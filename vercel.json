@@ -3,5 +3,6 @@
     { "source": "/", "destination": "/api" },
     { "source": "/(.*)", "destination": "/api" },
     { "source": "/api/(.*)", "destination": "/api" }
-  ]
+  ],
+  "installCommand": "npm i --no-audit --no-fund --ignore-scripts"
 }

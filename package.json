@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/playt-net/rolling-rick#readme",
   "dependencies": {
-    "@playt/client": "^9.0.0",
+    "@playt/client": "^9.1.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "lodash.throttle": "^4.1.1",

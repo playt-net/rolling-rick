@@ -44,6 +44,16 @@ export default class LoadingScene extends Phaser.Scene {
         }`,
       ]);
 
+      const reportError = this.add.text(100, 320, "Report error", {
+        fontSize: "28px",
+        fontFamily: "Courier",
+        color: "white",
+      });
+      reportError.setInteractive();
+      reportError.on("pointerdown", () => {
+        client.reportFatalError({userId:player.userId, matchId: match.id});
+      });
+
       this.add.text(100, 250, "Select difficulty:", {
         fontSize: "28px",
         fontFamily: "Courier",

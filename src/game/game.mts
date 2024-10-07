@@ -35,9 +35,16 @@ const gameId = params.get("gameId");
 if (!gameId) {
   throw new Error("Missing gameId query param");
 }
+
+const playerToken = params.get("playerToken");
+if (!playerToken) {
+  throw new Error("Missing playerToken query param");
+}
+
 export const client = PlaytBrowserClient({
   gameId,
   apiUrl: API_HOST,
+  playerToken,
 });
 
 if (!process.env.npm_package_version) {

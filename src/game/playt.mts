@@ -95,6 +95,7 @@ export function surrender(score: number) {
   });
 }
 
-export function endTutorial() {
-  return submitScore(0);
+export async function endTutorial() {
+  await updateScore(0);
+  await quitMatch();
 }

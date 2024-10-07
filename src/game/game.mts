@@ -8,7 +8,7 @@ import EndScene from "./scenes/end.mjs";
 new Phaser.Game({
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.NONE,
+    mode: Phaser.Scale.FIT,
     parent: "game",
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 800,

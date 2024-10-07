@@ -1,4 +1,4 @@
-import { Replay, submitScore, surrender, updateScore } from "../playt.mjs";
+import { isMuted, Replay, submitScore, surrender, updateScore } from "../playt.mjs";
 import throttle from "lodash.throttle";
 import { client } from "../game.mjs";
 
@@ -20,6 +20,7 @@ export default class PlayingScene extends Phaser.Scene {
   liveScoresText!: Phaser.GameObjects.Text;
   commands: Replay["commands"] = [];
   lastUpdate = Date.now();
+  mute = isMuted();
 
   others: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
   othersCommands: Replay["commands"][] = [];
@@ -146,6 +147,7 @@ export default class PlayingScene extends Phaser.Scene {
       })
     });
 
+    // The surrender button
     const surrenderText = this.add.text(640, 550, "SURRENDER", {
       fontSize: "26px",
       color: "white",
@@ -154,6 +156,18 @@ export default class PlayingScene extends Phaser.Scene {
     surrenderText.on("pointerdown", () => {
       this.physics.pause();
       surrender(this.score);
+    });
+
+    // the mute button
+    const muteText = this.add.text(550, 16, this.mute ? "🔈" : "🔇", {
+      fontSize: "32px",
+      color: "#000",
+    });
+    muteText.setInteractive();
+    muteText.on("pointerdown", () => {
+      this.mute = !this.mute;
+      muteText.setText(this.mute ? "🔈" : "🔇");
+      client.updatePlayerSettings({ mute: this.mute });
     });
 
     //  Collide the player and the stars with the platforms

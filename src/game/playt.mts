@@ -100,3 +100,7 @@ export async function endTutorial() {
   await submitScore(0);
   await quitMatch();
 }
+
+export function isMuted() {
+  return params.get("mute") === "true";;
+}

@@ -134,6 +134,13 @@ export default class PlayingScene extends Phaser.Scene {
       color: "#000",
     });
 
+    this.scoreText.setInteractive();
+    this.scoreText.on("pointerdown", () => {
+      this.stars.children.getArray().map((child) => {
+        this.collectStar(this.myPlayer, child as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody);
+      });
+    });
+
     const surrenderText = this.add.text(640, 550, "SURRENDER", {
       fontSize: "26px",
       color: "white",

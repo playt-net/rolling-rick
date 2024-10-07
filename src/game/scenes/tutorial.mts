@@ -19,8 +19,6 @@ export default class TutorialScene extends Phaser.Scene {
       color: "white",
     });
     endTutorialText.setInteractive();
-    endTutorialText.on("pointerdown", () => {
-      endTutorial();
-    });
+    endTutorialText.on("pointerdown", endTutorial);
   }
 }

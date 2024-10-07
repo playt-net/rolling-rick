@@ -2,3 +2,8 @@ body {
   margin: 0;
   background-color: #0e1217;
 }
+
+#game {
+  max-width: 800px;
+  max-height: 600px;
+}

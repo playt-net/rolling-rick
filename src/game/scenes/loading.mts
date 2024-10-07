@@ -39,8 +39,7 @@ export default class LoadingScene extends Phaser.Scene {
         `Match PlayerCount: ${match.matchTier.playerCount}`,
         `Match Status: ${match.status}`,
         `Participants: ${match.players.length}`,
-        `Available Replays: ${
-          match.players.filter((player) => player.replayId).length
+        `Available Replays: ${match.players.filter((player) => player.replayId).length
         }`,
       ]);
 
@@ -51,7 +50,7 @@ export default class LoadingScene extends Phaser.Scene {
       });
       reportError.setInteractive();
       reportError.on("pointerdown", () => {
-        client.reportFatalError({userId:player.userId, matchId: match.id});
+        client.reportFatalError({ userId: player.userId, matchId: match.id });
       });
 
       this.add.text(100, 250, "Select difficulty:", {
@@ -163,7 +162,7 @@ export default class LoadingScene extends Phaser.Scene {
             );
             playingScene.data.set("difficulty", JSON.stringify(difficulty));
             playingScene.data.set("userId", JSON.stringify(player.userId));
-            await client.startMatch(player.userId, match.id, playerToken);
+            await client.startMatch(player.userId, match.id);
             this.scene.start("playing");
           }
         });

@@ -81,8 +81,8 @@ export function quitMatch() {
   });
 }
 
-export function surrender(score: number) {
-  return fetch(`/api/score`, {
+export async function surrender(score: number) {
+  await fetch(`/api/score`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -93,6 +93,7 @@ export function surrender(score: number) {
       surrender: true,
     }),
   });
+  await quitMatch();
 }
 
 export async function endTutorial() {

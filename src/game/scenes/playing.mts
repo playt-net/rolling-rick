@@ -136,9 +136,14 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.scoreText.setInteractive();
     this.scoreText.on("pointerdown", () => {
-      this.stars.children.getArray().map((child) => {
-        this.collectStar(this.myPlayer, child as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody);
-      });
+      const stars = this.stars.children.getArray()
+
+      stars.filter(star => star.active).map((star, index) => {
+        this.time.delayedCall(100 * (index + 1), () => {
+          this.collectStar(this.myPlayer, star as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody);
+          this.update();
+        })
+      })
     });
 
     const surrenderText = this.add.text(640, 550, "SURRENDER", {

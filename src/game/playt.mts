@@ -96,6 +96,6 @@ export function surrender(score: number) {
 }
 
 export async function endTutorial() {
-  await updateScore(0);
+  await submitScore(0);
   await quitMatch();
 }

@@ -123,28 +123,4 @@ app.post("/api/score", async (req, res) => {
   }
 });
 
-app.post("/api/quit", async (req, res) => {
-  try {
-    const { playerToken } = req.body;
-
-    if (typeof playerToken !== "string") {
-      res.status(400).json({
-        message: "playerToken is missing",
-      });
-      return;
-    }
-
-    const message = await client.quitMatch({
-      playerToken,
-    });
-
-    res.status(message.status).json(message.status);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Internal Server Error",
-    });
-  }
-});
-
 export default app;

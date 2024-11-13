@@ -1,4 +1,10 @@
-import { isMuted, Replay, submitScore, surrender, updateScore } from "../playt.mjs";
+import {
+  isMuted,
+  type Replay,
+  submitScore,
+  surrender,
+  updateScore,
+} from "../playt.mjs";
 import throttle from "lodash.throttle";
 import { client } from "../game.mjs";
 
@@ -27,7 +33,7 @@ export default class PlayingScene extends Phaser.Scene {
 
   startedAt: number = Date.now();
   liveMatch: {
-    send: (payload: any) => void;
+    send: (payload: unknown) => void;
   } | null = null;
 
   constructor() {
@@ -99,7 +105,7 @@ export default class PlayingScene extends Phaser.Scene {
       setXY: { x: 12, y: 0, stepX: 70 },
     });
 
-    this.stars.children.iterate(function (child, index) {
+    this.stars.children.iterate((child, index) => {
       //  Give each star a slightly different bounce
       // @ts-ignore
       child.setBounceY(0.5 + Math.sin(index) / 4);
@@ -117,13 +123,13 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.bombs = this.physics.add.group();
 
-    let bomb1 = this.bombs.create(400, 32, "bomb");
+    const bomb1 = this.bombs.create(400, 32, "bomb");
     bomb1.setBounce(1);
     bomb1.setCollideWorldBounds(true);
     bomb1.setVelocity(this.bombVelocity, bombVelocity);
     bomb1.allowGravity = false;
 
-    let bomb2 = this.bombs.create(200, 32, "bomb");
+    const bomb2 = this.bombs.create(200, 32, "bomb");
     bomb2.setBounce(1);
     bomb2.setCollideWorldBounds(true);
     bomb2.setVelocity(-this.bombVelocity, bombVelocity);
@@ -137,14 +143,19 @@ export default class PlayingScene extends Phaser.Scene {
 
     this.scoreText.setInteractive();
     this.scoreText.on("pointerdown", () => {
-      const stars = this.stars.children.getArray()
+      const stars = this.stars.children.getArray();
 
-      stars.filter(star => star.active).map((star, index) => {
-        this.time.delayedCall(100 * (index + 1), () => {
-          this.collectStar(this.myPlayer, star as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody);
-          this.update();
-        })
-      })
+      stars
+        .filter((star) => star.active)
+        .map((star, index) => {
+          this.time.delayedCall(100 * (index + 1), () => {
+            this.collectStar(
+              this.myPlayer,
+              star as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+            );
+            this.update();
+          });
+        });
     });
 
     // The surrender button

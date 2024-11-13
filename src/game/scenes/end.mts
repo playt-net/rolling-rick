@@ -1,4 +1,4 @@
-import { quitMatch } from "../playt.mjs";
+import { client } from "../game.mjs";
 
 export default class EndScene extends Phaser.Scene {
   constructor() {
@@ -22,7 +22,7 @@ export default class EndScene extends Phaser.Scene {
 
     endText.on("pointerdown", async () => {
       try {
-        await quitMatch();
+        await client.quitMatch();
       } catch (error) {
         endText.setText([
           "You destroyed the internet!",

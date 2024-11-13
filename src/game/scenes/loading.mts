@@ -1,6 +1,6 @@
 import { client } from "../game.mjs";
-import { getMatch, getReplay, playerToken, Replay } from "../playt.mjs";
-import PlayingScene from "./playing.mjs";
+import { getMatch, getReplay, playerToken, type Replay } from "../playt.mjs";
+import type PlayingScene from "./playing.mjs";
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -22,14 +22,14 @@ export default class LoadingScene extends Phaser.Scene {
 
     try {
       if (!playerToken) {
-        statusText.setText([`Player Token: ✖`, `Participants: ?`]);
+        statusText.setText(["Player Token: ✖", "Participants: ?"]);
         return;
       }
       const match = await getMatch();
 
       const { player } = match;
       if (!player) {
-        statusText.setText([`Player Token: -`, `Participants: ?`]);
+        statusText.setText(["Player Token: -", "Participants: ?"]);
         return;
       }
 
@@ -103,6 +103,7 @@ export default class LoadingScene extends Phaser.Scene {
         [userId: string]: Replay;
       } = {};
       match.players.forEach(async (player, index) => {
+        // biome-ignore lint/suspicious/noSelfCompare: no idea why this is here?
         if (player.userId === player.userId) {
           return;
         }

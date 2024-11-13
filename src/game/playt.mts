@@ -1,4 +1,5 @@
-import { paths } from "@playt/client";
+import type { paths } from "@playt/client";
+import { client } from "./game.mjs";
 
 const params = new URLSearchParams(window.location.search);
 
@@ -37,7 +38,7 @@ export async function getReplay(matchId: string, userId: string) {
 }
 
 export async function updateScore(score: number) {
-  const response = await fetch(`/api/score`, {
+  const response = await fetch("/api/score", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export async function updateScore(score: number) {
 }
 
 export function submitScore(score: number, commands?: Replay["commands"]) {
-  return fetch(`/api/score`, {
+  return fetch("/api/score", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,20 +70,8 @@ export function submitScore(score: number, commands?: Replay["commands"]) {
   });
 }
 
-export function quitMatch() {
-  return fetch(`/api/quit`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      playerToken,
-    }),
-  });
-}
-
 export async function surrender(score: number) {
-  await fetch(`/api/score`, {
+  await fetch("/api/score", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -93,14 +82,14 @@ export async function surrender(score: number) {
       surrender: true,
     }),
   });
-  await quitMatch();
+  await client.quitMatch();
 }
 
 export async function endTutorial() {
   await submitScore(0);
-  await quitMatch();
+  await client.quitMatch();
 }
 
 export function isMuted() {
-  return params.get("mute") === "true";;
+  return params.get("mute") === "true";
 }

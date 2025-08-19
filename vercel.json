@@ -4,5 +4,5 @@
     { "source": "/(.*)", "destination": "/api" },
     { "source": "/api/(.*)", "destination": "/api" }
   ],
-  "installCommand": "npm i --no-audit --no-fund --ignore-scripts"
+  "installCommand": "pnpm install --frozen-lockfile "
 }

@@ -11,7 +11,7 @@ Copy `.env.example` to `.env` and set the `API_KEY` accordingly for the game you
 The game is built with TypeScript and Phaser. To build and run the game, run the following command:
 
 ```sh
-npm run build && npm run start
+pnpm run build && pnpm run start
 ```
 
 The source files are under the `src/game` directory. The game JavaScript files are built in the `game` directory (like `game.js`).

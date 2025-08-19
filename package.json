@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "20",
-    "npm": "10"
+    "node": "22"
   },
   "scripts": {
     "clean": "rimraf './dist'",
-    "build": "npm run clean && tsc && babel src -d dist --extensions .mts --out-file-extension .mjs && webpack",
+    "build": "pnpm run clean && tsc && babel src -d dist --extensions .mts --out-file-extension .mjs && webpack",
     "start": "node -r dotenv/config dist/server/server.mjs"
   },
   "type": "module",
